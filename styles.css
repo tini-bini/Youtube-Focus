@@ -1,0 +1,152 @@
+:root {
+  color-scheme: light dark;
+  --ytfc-home-bg:
+    radial-gradient(circle at top left, rgba(68, 138, 255, 0.16), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.1), transparent 32%),
+    linear-gradient(180deg, #f5f7fb 0%, #edf2f7 100%);
+  --ytfc-home-eyebrow: #2563eb;
+  --ytfc-home-title: #111827;
+  --ytfc-home-copy: #475467;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ytfc-home-bg:
+      radial-gradient(circle at top left, rgba(96, 165, 250, 0.18), transparent 34%),
+      radial-gradient(circle at bottom right, rgba(45, 212, 191, 0.14), transparent 34%),
+      linear-gradient(180deg, #0b0f16 0%, #070a10 100%);
+    --ytfc-home-eyebrow: #8ec5ff;
+    --ytfc-home-title: #f5f7fb;
+    --ytfc-home-copy: rgba(255, 255, 255, 0.78);
+  }
+}
+
+html.ytfc-hide-comments ytd-comments,
+html.ytfc-hide-comments #comments,
+html.ytfc-hide-comments ytd-engagement-panel-section-list-renderer[target-id*="comments"] {
+  display: none !important;
+}
+
+html.ytfc-hide-sidebar #secondary,
+html.ytfc-hide-sidebar #secondary-inner,
+html.ytfc-hide-sidebar ytd-watch-next-secondary-results-renderer {
+  display: none !important;
+}
+
+html.ytfc-hide-sidebar ytd-watch-flexy[is-two-columns_] #primary.ytd-watch-flexy,
+html.ytfc-hide-sidebar ytd-watch-flexy[flexy] #primary.ytd-watch-flexy {
+  max-width: 100% !important;
+  margin-right: 0 !important;
+}
+
+html.ytfc-hide-home-feed ytd-browse[page-subtype="home"] ytd-rich-grid-renderer,
+html.ytfc-hide-home-feed ytd-browse[page-subtype="home"] ytd-rich-section-renderer,
+html.ytfc-hide-home-feed ytd-browse[page-subtype="home"] ytd-continuation-item-renderer {
+  display: none !important;
+}
+
+html.ytfc-hide-home-feed ytd-browse[page-subtype="home"] {
+  background: var(--ytfc-home-bg) !important;
+}
+
+html.ytfc-hide-home-feed ytd-browse[page-subtype="home"] #chips-wrapper,
+html.ytfc-hide-home-feed ytd-browse[page-subtype="home"] ytd-feed-filter-chip-bar-renderer,
+html.ytfc-hide-home-feed ytd-browse[page-subtype="home"] #header {
+  display: none !important;
+}
+
+html.ytfc-hide-home-feed ytd-browse[page-subtype="home"] ytd-two-column-browse-results-renderer,
+html.ytfc-hide-home-feed ytd-browse[page-subtype="home"] #primary {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+html.ytfc-hide-home-feed ytd-browse[page-subtype="home"] #primary {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  min-height: calc(100vh - 56px) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+html.ytfc-hide-shorts ytd-rich-shelf-renderer[is-shorts],
+html.ytfc-hide-shorts ytd-reel-shelf-renderer,
+html.ytfc-hide-shorts a[href^="/shorts"],
+html.ytfc-hide-shorts a[href*="youtube.com/shorts/"] {
+  display: none !important;
+}
+
+.ytfc-managed-hide {
+  display: none !important;
+}
+
+#ytfc-focus-message {
+  position: fixed !important;
+  inset: 56px 0 0;
+  z-index: 2147483640;
+  display: flex !important;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.ytfc-focus-shell {
+  display: flex;
+  width: 100%;
+  min-height: 100%;
+  background: var(--ytfc-home-bg);
+}
+
+.ytfc-focus-card {
+  display: flex;
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+  padding: clamp(42px, 8vw, 112px);
+  background: transparent;
+}
+
+.ytfc-focus-eyebrow {
+  margin: 0 0 12px;
+  color: var(--ytfc-home-eyebrow);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ytfc-focus-title {
+  margin: 0;
+  max-width: 900px;
+  color: var(--ytfc-home-title);
+  font-size: clamp(34px, 5vw, 72px);
+  line-height: 1.02;
+  font-weight: 700;
+}
+
+.ytfc-focus-copy {
+  max-width: 760px;
+  margin: 20px 0 0;
+  color: var(--ytfc-home-copy);
+  font-size: clamp(16px, 1.8vw, 22px);
+  line-height: 1.65;
+}
+
+@media (max-width: 900px) {
+  #ytfc-focus-message {
+    inset: 56px 0 0;
+  }
+
+  .ytfc-focus-card {
+    padding: 32px 22px 44px;
+  }
+
+  .ytfc-focus-title {
+    line-height: 1.08;
+  }
+}

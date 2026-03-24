@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Focus Clean</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="app">
+
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-dot" aria-hidden="true"></span>
+          <span class="brand-name">YouTube Focus Clean</span>
+        </div>
+        <span class="plan-chip" id="plan-chip">Free</span>
+      </header>
+
+      <div class="divider" role="separator"></div>
+
+      <section class="settings" aria-label="Focus settings">
+        <label class="row" for="hideHomeFeed" data-setting-card="hideHomeFeed">
+          <span class="row-label">
+            Homepage feed
+            <span class="badge">Free</span>
+          </span>
+          <span class="switch">
+            <input id="hideHomeFeed" type="checkbox" data-setting="hideHomeFeed" />
+            <span class="track" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="row" for="hideShorts" data-setting-card="hideShorts">
+          <span class="row-label">
+            Shorts
+            <span class="badge">Free</span>
+          </span>
+          <span class="switch">
+            <input id="hideShorts" type="checkbox" data-setting="hideShorts" />
+            <span class="track" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="row" for="hideComments" data-setting-card="hideComments" data-requires-premium="true">
+          <span class="row-label">
+            Comments
+            <span class="badge badge-pro">Pro</span>
+          </span>
+          <span class="switch">
+            <input id="hideComments" type="checkbox" data-setting="hideComments" />
+            <span class="track" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="row" for="hideSidebar" data-setting-card="hideSidebar" data-requires-premium="true">
+          <span class="row-label">
+            Sidebar recommendations
+            <span class="badge badge-pro">Pro</span>
+          </span>
+          <span class="switch">
+            <input id="hideSidebar" type="checkbox" data-setting="hideSidebar" />
+            <span class="track" aria-hidden="true"></span>
+          </span>
+        </label>
+      </section>
+
+      <div class="divider" role="separator"></div>
+
+      <section class="actions">
+        <button class="btn-primary" id="monk-mode-button" type="button">Monk Mode</button>
+        <button class="btn-upgrade" id="upgrade-button" type="button">Upgrade · €10</button>
+      </section>
+
+      <footer class="app-footer">
+        <button class="btn-donate" id="donate-button" type="button">
+          <svg class="paypal-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="currentColor">
+            <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.58 2.977-2.477 4.466-5.765 4.466h-2.187c-.37 0-.685.267-.744.633L10.67 19.33l-.348 2.207a.506.506 0 0 0 .499.59h3.505c.46 0 .85-.334.92-.789l.038-.197.731-4.626.047-.254a.932.932 0 0 1 .92-.789h.58c3.755 0 6.693-1.525 7.547-5.935.358-1.84.173-3.375-.887-4.62z"/>
+          </svg>
+          Donate
+        </button>
+        <p class="status" id="status-text" aria-live="polite"></p>
+      </footer>
+
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

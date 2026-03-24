@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Focus Clean",
+  "version": "1.0.0",
+  "description": "Create a distraction-free YouTube experience by hiding the home feed, Shorts, comments, and related videos.",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_title": "YouTube Focus Clean",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 :root {
   color-scheme: light dark;
   --ytfc-home-bg:
-    radial-gradient(circle at top left, rgba(68, 138, 255, 0.16), transparent 34%),
-    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.1), transparent 32%),
-    linear-gradient(180deg, #f5f7fb 0%, #edf2f7 100%);
-  --ytfc-home-eyebrow: #2563eb;
+    radial-gradient(circle at top left, rgba(117, 177, 131, 0.14), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(90, 145, 104, 0.09), transparent 32%),
+    linear-gradient(180deg, #f3f8f4 0%, #edf5ee 100%);
+  --ytfc-home-eyebrow: #5a9168;
   --ytfc-home-title: #111827;
   --ytfc-home-copy: #475467;
 }
@@ -12,11 +12,11 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --ytfc-home-bg:
-      radial-gradient(circle at top left, rgba(96, 165, 250, 0.18), transparent 34%),
-      radial-gradient(circle at bottom right, rgba(45, 212, 191, 0.14), transparent 34%),
-      linear-gradient(180deg, #0b0f16 0%, #070a10 100%);
-    --ytfc-home-eyebrow: #8ec5ff;
-    --ytfc-home-title: #f5f7fb;
+      radial-gradient(circle at top left, rgba(117, 177, 131, 0.16), transparent 34%),
+      radial-gradient(circle at bottom right, rgba(90, 145, 104, 0.12), transparent 34%),
+      linear-gradient(180deg, #0b1410 0%, #080f09 100%);
+    --ytfc-home-eyebrow: #8ec49e;
+    --ytfc-home-title: #f3f8f4;
     --ytfc-home-copy: rgba(255, 255, 255, 0.78);
   }
 }

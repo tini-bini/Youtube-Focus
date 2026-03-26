@@ -1,28 +1,54 @@
 :root {
   color-scheme: light dark;
-  --bg: #f0f4fb;
+  --bg: #f2f8f3;
   --surface: #ffffff;
-  --border: rgba(9, 17, 31, 0.09);
-  --text: #0d1117;
-  --muted: #6e7d91;
-  --accent: #1f6feb;
-  --accent-dk: #1658bf;
+  --border: rgba(15, 42, 20, 0.09);
+  --text: #0f1f11;
+  --muted: #5d7462;
+  --accent: #75b183;
+  --accent-dk: #5a9168;
   --pro: #b45309;
   --pro-bg: rgba(217, 119, 6, 0.09);
   --pro-border: rgba(217, 119, 6, 0.22);
-  --success: #14804a;
+  --success: #2d7d46;
   --transition: 150ms ease;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0d1117;
-    --surface: #161b22;
+    --bg: #0e1810;
+    --surface: #141f16;
     --border: rgba(255, 255, 255, 0.09);
-    --text: #e6edf3;
-    --muted: #7d8590;
+    --text: #e4ede6;
+    --muted: #7d9480;
     --pro: #f59e0b;
   }
+}
+
+body.theme-light {
+  color-scheme: light;
+  --bg: #f2f8f3;
+  --surface: #ffffff;
+  --border: rgba(15, 42, 20, 0.09);
+  --text: #0f1f11;
+  --muted: #5d7462;
+  --pro: #b45309;
+  --pro-bg: rgba(217, 119, 6, 0.09);
+  --pro-border: rgba(217, 119, 6, 0.22);
+  --success: #2d7d46;
+}
+
+body.theme-dark {
+  color-scheme: dark;
+  --bg: #0e1810;
+  --surface: #141f16;
+  --border: rgba(255, 255, 255, 0.09);
+  --text: #e4ede6;
+  --muted: #7d9480;
+  --pro: #f59e0b;
+  --pro-bg: rgba(217, 119, 6, 0.12);
+  --pro-border: rgba(217, 119, 6, 0.26);
+  --success: #3fa85e;
 }
 
 * {
@@ -65,7 +91,7 @@ body {
   height: 9px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 7px rgba(31, 111, 235, 0.55);
+  box-shadow: 0 0 7px rgba(117, 177, 131, 0.65);
   flex-shrink: 0;
 }
 
@@ -73,6 +99,38 @@ body {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.01em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-theme {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background var(--transition), color var(--transition);
+  flex-shrink: 0;
+}
+
+.btn-theme:hover {
+  background: rgba(117, 177, 131, 0.12);
+  color: var(--accent);
+}
+
+.btn-theme svg {
+  width: 14px;
+  height: 14px;
 }
 
 .plan-chip {
@@ -83,8 +141,8 @@ body {
   padding: 3px 9px;
   border-radius: 99px;
   color: var(--accent);
-  background: rgba(31, 111, 235, 0.1);
-  border: 1px solid rgba(31, 111, 235, 0.2);
+  background: rgba(117, 177, 131, 0.10);
+  border: 1px solid rgba(117, 177, 131, 0.22);
 }
 
 body.is-premium .plan-chip {
@@ -120,7 +178,7 @@ body.is-premium .plan-chip {
 }
 
 .row:hover {
-  background: rgba(31, 111, 235, 0.05);
+  background: rgba(117, 177, 131, 0.07);
 }
 
 .row.is-locked {
@@ -150,8 +208,8 @@ body.is-premium .plan-chip {
   padding: 2px 6px;
   border-radius: 99px;
   color: var(--accent);
-  background: rgba(31, 111, 235, 0.09);
-  border: 1px solid rgba(31, 111, 235, 0.16);
+  background: rgba(117, 177, 131, 0.09);
+  border: 1px solid rgba(117, 177, 131, 0.18);
   flex-shrink: 0;
 }
 
@@ -227,7 +285,7 @@ body.is-premium .plan-chip {
 
 .actions {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   padding: 12px 16px;
 }
@@ -259,13 +317,12 @@ body.is-premium .plan-chip {
   color: var(--text);
   font: 600 13px/1 "Segoe UI", system-ui, sans-serif;
   cursor: pointer;
-  white-space: nowrap;
   transition: background var(--transition), border-color var(--transition);
 }
 
 .btn-upgrade:hover {
-  background: rgba(31, 111, 235, 0.06);
-  border-color: rgba(31, 111, 235, 0.28);
+  background: rgba(117, 177, 131, 0.07);
+  border-color: rgba(117, 177, 131, 0.30);
   color: var(--accent);
 }
 
@@ -278,6 +335,34 @@ body.is-premium .plan-chip {
   background: transparent;
   border-color: var(--border);
   color: var(--text);
+}
+
+.btn-secondary {
+  grid-column: 1 / -1;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px dashed rgba(117, 177, 131, 0.35);
+  background: rgba(117, 177, 131, 0.06);
+  color: var(--accent-dk);
+  font: 600 12px/1 "Segoe UI", system-ui, sans-serif;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.btn-secondary:hover {
+  background: rgba(117, 177, 131, 0.1);
+  border-color: rgba(117, 177, 131, 0.5);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn-secondary:disabled:hover {
+  background: rgba(117, 177, 131, 0.06);
+  border-color: rgba(117, 177, 131, 0.35);
+  color: var(--accent-dk);
 }
 
 /* ── Footer ── */

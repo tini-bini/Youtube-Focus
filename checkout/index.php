@@ -4,7 +4,15 @@ declare(strict_types=1);
 
 require __DIR__ . '/paypal.php';
 
-$clientId = paypalClientId();
+$checkoutError = null;
+$clientId = '';
+
+try {
+    $clientId = paypalClientId();
+} catch (Throwable $exception) {
+    $checkoutError = $exception->getMessage();
+}
+
 $currency = paypalCurrency();
 $itemName = paypalItemName();
 $mode = isset($_GET['mode']) && $_GET['mode'] === 'premium' ? 'premium' : 'support';
@@ -41,10 +49,12 @@ $environmentLabel = ucfirst($environment);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FlegarTech Checkout</title>
     <link rel="stylesheet" href="checkout.css" />
-    <script
-      src="https://www.paypal.com/sdk/js?client-id=<?= htmlspecialchars($clientId, ENT_QUOTES) ?>&currency=<?= htmlspecialchars($currency, ENT_QUOTES) ?>&intent=capture&components=buttons"
-      data-sdk-integration-source="button-factory"
-    ></script>
+    <?php if ($checkoutError === null): ?>
+      <script
+        src="https://www.paypal.com/sdk/js?client-id=<?= htmlspecialchars($clientId, ENT_QUOTES) ?>&currency=<?= htmlspecialchars($currency, ENT_QUOTES) ?>&intent=capture&components=buttons"
+        data-sdk-integration-source="button-factory"
+      ></script>
+    <?php endif; ?>
   </head>
   <body>
     <main class="shell">
@@ -108,7 +118,13 @@ $environmentLabel = ucfirst($environment);
           </div>
         <?php endif; ?>
 
-        <div id="status-banner" class="status-banner" hidden></div>
+        <div
+          id="status-banner"
+          class="status-banner<?= $checkoutError !== null ? ' is-error' : '' ?>"
+          <?= $checkoutError !== null ? '' : 'hidden' ?>
+        >
+          <?= $checkoutError !== null ? htmlspecialchars($checkoutError, ENT_QUOTES) : '' ?>
+        </div>
         <div id="paypal-button-container" class="paypal-button-shell"></div>
       </section>
     </main>
@@ -116,7 +132,8 @@ $environmentLabel = ucfirst($environment);
     <script>
       const checkoutConfig = {
         currency: "<?= htmlspecialchars($currency, ENT_QUOTES) ?>",
-        defaultAmount: "<?= htmlspecialchars($defaultAmount, ENT_QUOTES) ?>"
+        defaultAmount: "<?= htmlspecialchars($defaultAmount, ENT_QUOTES) ?>",
+        isReady: <?= $checkoutError === null ? 'true' : 'false' ?>
       };
 
       const amountInput = document.getElementById("amount-input");
@@ -134,71 +151,75 @@ $environmentLabel = ucfirst($environment);
         syncActivePreset(amountInput.value);
       });
 
-      paypal.Buttons({
-        style: {
-          shape: "pill",
-          color: "blue",
-          layout: "vertical",
-          label: "paypal"
-        },
-        createOrder: async () => {
-          clearStatus();
+      if (checkoutConfig.isReady && window.paypal && typeof window.paypal.Buttons === "function") {
+        paypal.Buttons({
+          style: {
+            shape: "pill",
+            color: "blue",
+            layout: "vertical",
+            label: "paypal"
+          },
+          createOrder: async () => {
+            clearStatus();
 
-          const response = await fetch("create-order.php", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              amount: amountInput.value,
-              currency: checkoutConfig.currency
-            })
-          });
+            const response = await fetch("create-order.php", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                amount: amountInput.value,
+                currency: checkoutConfig.currency
+              })
+            });
 
-          const data = await response.json();
+            const data = await response.json();
 
-          if (!response.ok || !data.id) {
-            throw new Error(data.error || "Could not create PayPal order.");
+            if (!response.ok || !data.id) {
+              throw new Error(data.error || "Could not create PayPal order.");
+            }
+
+            return data.id;
+          },
+          onApprove: async (data) => {
+            clearStatus();
+
+            const response = await fetch("capture-order.php", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                orderID: data.orderID
+              })
+            });
+
+            const capture = await response.json();
+
+            if (!response.ok) {
+              throw new Error(capture.error || "Could not capture PayPal order.");
+            }
+
+            showStatus(
+              "Payment captured: " +
+                capture.amount +
+                " " +
+                capture.currency +
+                (capture.payer ? " for " + capture.payer : "") +
+                ".",
+              false
+            );
+          },
+          onError: (error) => {
+            showStatus(error.message || "Something went wrong with PayPal checkout.", true);
+          },
+          onCancel: () => {
+            showStatus("Checkout was cancelled.", true);
           }
-
-          return data.id;
-        },
-        onApprove: async (data) => {
-          clearStatus();
-
-          const response = await fetch("capture-order.php", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              orderID: data.orderID
-            })
-          });
-
-          const capture = await response.json();
-
-          if (!response.ok) {
-            throw new Error(capture.error || "Could not capture PayPal order.");
-          }
-
-          showStatus(
-            "Payment captured: " +
-              capture.amount +
-              " " +
-              capture.currency +
-              (capture.payer ? " for " + capture.payer : "") +
-              ".",
-            false
-          );
-        },
-        onError: (error) => {
-          showStatus(error.message || "Something went wrong with PayPal checkout.", true);
-        },
-        onCancel: () => {
-          showStatus("Checkout was cancelled.", true);
-        }
-      }).render("#paypal-button-container");
+        }).render("#paypal-button-container");
+      } else if (checkoutConfig.isReady) {
+        showStatus("PayPal SDK did not load. Refresh and try again.", true);
+      }
 
       syncActivePreset(checkoutConfig.defaultAmount);
 

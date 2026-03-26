@@ -8,16 +8,16 @@ Chrome Extension Manifest V3 MVP by FlegarTech.
 YouTube/
 ├── content.js
 ├── checkout/
+│   ├── .env.example
+│   ├── .gitignore
 │   ├── capture-order.php
 │   ├── checkout.css
 │   ├── config.php
 │   ├── create-order.php
 │   ├── index.php
 │   ├── paypal.php
-│   └── start-sandbox-server.cmd
+│   ├── start-sandbox-server.cmd
 │   └── stop-sandbox-server.cmd
-│   ├── .env.example
-│   └── .gitignore
 ├── manifest.json
 ├── popup.css
 ├── popup.html
@@ -51,9 +51,11 @@ This project now includes a real PayPal checkout starter in `checkout/`.
 1. Copy `checkout\.env.example` to `checkout\.env`
 2. Put your PayPal credentials and checkout base URL into `checkout\.env`
 3. For local sandbox testing, set `CHECKOUT_BASE_URL=http://127.0.0.1:8080/checkout`
-4. Start the local PHP server with `checkout\start-sandbox-server.cmd`
-5. Open `http://127.0.0.1:8080/checkout/` to test the page directly
-6. Open the extension popup and click `Open Checkout`
+4. Update `checkout\start-sandbox-server.cmd` if your PHP executable is not at `C:\xampp\php\php.exe`
+5. Start the local PHP server with `checkout\start-sandbox-server.cmd`
+6. Open `http://127.0.0.1:8080/checkout/` to test the page directly
+7. Open the extension popup and click `Open Checkout`
+8. After payment, return to the popup and click `I've Paid - Unlock Here`
 
 Important:
 

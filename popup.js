@@ -1,5 +1,9 @@
 const STORAGE_KEY = "ytFocusCleanSettings";
 const ACCOUNT_KEY = "ytFocusCleanAccount";
+const THEME_KEY = "ytFocusCleanTheme";
+
+const MOON_SVG = `<svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 1.5a6.5 6.5 0 1 0 8.5 8.5A5 5 0 0 1 6 1.5z"/></svg>`;
+const SUN_SVG = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.22 3.22l1.42 1.42M11.36 11.36l1.42 1.42M3.22 12.78l1.42-1.42M11.36 4.64l1.42-1.42"/></svg>`;
 
 const DEFAULT_SETTINGS = {
   hideHomeFeed: true,
@@ -25,7 +29,8 @@ const SETTING_LABELS = {
 };
 
 const CHECKOUT_CONFIG = {
-  premiumLifetimeUrl: "https://paypal.me/TiniFlegar/10EUR",
+  preferredCheckoutUrl: "http://127.0.0.1:8080/checkout/?mode=premium&amount=4.99",
+  fallbackPremiumUrl: "https://paypal.me/TiniFlegar/10EUR",
   donationUrl: "https://paypal.me/TiniFlegar"
 };
 
@@ -44,9 +49,12 @@ function initializePopup() {
     planChip: document.getElementById("plan-chip"),
     monkModeButton: document.getElementById("monk-mode-button"),
     upgradeButton: document.getElementById("upgrade-button"),
-    donateButton: document.getElementById("donate-button")
+    activateButton: document.getElementById("activate-button"),
+    donateButton: document.getElementById("donate-button"),
+    themeToggleButton: document.getElementById("theme-toggle-button")
   };
 
+  initTheme(elements.themeToggleButton);
   bindEvents(elements);
 
   loadStoredState((settings, account) => {
@@ -121,8 +129,26 @@ function bindEvents(elements) {
       return;
     }
 
-    window.open(CHECKOUT_CONFIG.premiumLifetimeUrl, "_blank", "noopener,noreferrer");
-    showStatus(elements.statusElement, "Opened PayPal payment link.");
+    const checkoutUrl = CHECKOUT_CONFIG.preferredCheckoutUrl || CHECKOUT_CONFIG.fallbackPremiumUrl;
+    window.open(checkoutUrl, "_blank", "noopener,noreferrer");
+    showStatus(elements.statusElement, "Opened premium checkout.");
+  });
+
+  elements.activateButton?.addEventListener("click", () => {
+    if (state.account.hasPremium) {
+      return;
+    }
+
+    updateAccount(
+      {
+        hasPremium: true,
+        billingCycle: "monthly",
+        activatedAt: new Date().toISOString()
+      },
+      () => {
+        showStatus(elements.statusElement, "Premium unlocked on this browser.");
+      }
+    );
   });
 
   elements.donateButton?.addEventListener("click", () => {
@@ -143,7 +169,12 @@ function render(elements) {
 
   if (elements.upgradeButton) {
     elements.upgradeButton.disabled = isPremium;
-    elements.upgradeButton.textContent = isPremium ? "Pro Active" : "Upgrade · €10";
+    elements.upgradeButton.textContent = isPremium ? "Pro Active" : "Open Checkout";
+  }
+
+  if (elements.activateButton) {
+    elements.activateButton.disabled = isPremium;
+    elements.activateButton.textContent = isPremium ? "Premium Unlocked" : "I've Paid - Unlock Here";
   }
 
   elements.toggleElements.forEach((element) => {
@@ -193,6 +224,12 @@ function updateSettings(partialSettings, callback) {
   const nextSettings = { ...state.settings, ...partialSettings };
   state.settings = sanitizeSettings(nextSettings);
   chrome.storage.local.set({ [STORAGE_KEY]: state.settings }, callback);
+}
+
+function updateAccount(partialAccount, callback) {
+  const nextAccount = { ...state.account, ...partialAccount };
+  state.account = sanitizeAccount(nextAccount);
+  chrome.storage.local.set({ [ACCOUNT_KEY]: state.account }, callback);
 }
 
 function sanitizeSettings(rawSettings) {
@@ -264,6 +301,38 @@ function getEffectiveSettings(settings, account) {
   }
 
   return effectiveSettings;
+}
+
+function initTheme(btn) {
+  chrome.storage.local.get([THEME_KEY], (result) => {
+    applyTheme(result[THEME_KEY] || null, btn);
+  });
+
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const forcedDark = document.body.classList.contains("theme-dark");
+      const forcedLight = document.body.classList.contains("theme-light");
+      const effectiveIsDark = forcedDark || (!forcedLight && systemIsDark);
+      const next = effectiveIsDark ? "light" : "dark";
+      chrome.storage.local.set({ [THEME_KEY]: next }, () => {
+        applyTheme(next, btn);
+      });
+    });
+  }
+}
+
+function applyTheme(theme, btn) {
+  document.body.classList.remove("theme-light", "theme-dark");
+  if (theme === "dark") document.body.classList.add("theme-dark");
+  else if (theme === "light") document.body.classList.add("theme-light");
+
+  if (btn) {
+    const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const effectiveIsDark = theme === "dark" || (theme === null && systemIsDark);
+    btn.innerHTML = effectiveIsDark ? SUN_SVG : MOON_SVG;
+    btn.setAttribute("aria-label", effectiveIsDark ? "Switch to light mode" : "Switch to dark mode");
+  }
 }
 
 function showStatus(statusElement, message) {

@@ -29,7 +29,7 @@ const SETTING_LABELS = {
 };
 
 const CHECKOUT_CONFIG = {
-  preferredCheckoutUrl: "http://127.0.0.1:8080/checkout/?mode=premium&amount=4.99",
+  preferredCheckoutUrl: "",
   fallbackPremiumUrl: "https://paypal.me/TiniFlegar/10EUR",
   donationUrl: "https://paypal.me/TiniFlegar"
 };

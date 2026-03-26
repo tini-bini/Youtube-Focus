@@ -54,8 +54,9 @@ This project now includes a real PayPal checkout starter in `checkout/`.
 4. Update `checkout\start-sandbox-server.cmd` if your PHP executable is not at `C:\xampp\php\php.exe`
 5. Start the local PHP server with `checkout\start-sandbox-server.cmd`
 6. Open `http://127.0.0.1:8080/checkout/` to test the page directly
-7. Open the extension popup and click `Open Checkout`
-8. After payment, return to the popup and click `I've Paid - Unlock Here`
+7. If you want the extension to open your local checkout during development, set `preferredCheckoutUrl` in `popup.js` to `http://127.0.0.1:8080/checkout/?mode=premium&amount=4.99`
+8. Open the extension popup and click `Open Checkout`
+9. After payment, return to the popup and click `I've Paid - Unlock Here`
 
 Important:
 

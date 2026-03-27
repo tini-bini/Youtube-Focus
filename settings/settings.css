@@ -1,0 +1,199 @@
+/* RealDeal Settings Page */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      rgba(255, 255, 255, 0.82);
+  --bg2:     rgba(248, 250, 252, 0.62);
+  --bg3:     rgba(255, 255, 255, 0.48);
+  --fg:      #0f172a;
+  --fg2:     #64748b;
+  --border:  rgba(148, 163, 184, 0.22);
+  --accent:  #75b183;
+  --green:   #22c55e;
+  --red:     #ef4444;
+  --radius:  10px;
+  --shadow:  0 18px 40px rgba(15, 23, 42, 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    --bg:     rgba(15, 23, 42, 0.86);
+    --bg2:    rgba(30, 41, 59, 0.64);
+    --bg3:    rgba(51, 65, 85, 0.36);
+    --fg:     #e2e8f0;
+    --fg2:    #94a3b8;
+    --border: rgba(148, 163, 184, 0.18);
+    --shadow: 0 22px 44px rgba(2, 6, 23, 0.32);
+  }
+}
+
+html[data-theme="dark"] {
+  --bg:     rgba(15, 23, 42, 0.86);
+  --bg2:    rgba(30, 41, 59, 0.64);
+  --bg3:    rgba(51, 65, 85, 0.36);
+  --fg:     #e2e8f0;
+  --fg2:    #94a3b8;
+  --border: rgba(148, 163, 184, 0.18);
+  --shadow: 0 22px 44px rgba(2, 6, 23, 0.32);
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(117, 177, 131, 0.18), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(117, 177, 131, 0.09), transparent 28%),
+    linear-gradient(180deg, rgba(255,255,255,0.12), transparent 30%);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+#app { max-width: 640px; margin: 0 auto; padding: 0 20px; }
+
+header {
+  padding: 20px 0 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#logo {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 800; font-size: 18px; color: var(--accent);
+}
+#theme-toggle {
+  background: none; border: none; color: var(--fg2);
+  cursor: pointer; padding: 6px; border-radius: 6px;
+  display: flex; align-items: center;
+  transition: background 0.15s;
+}
+#theme-toggle:hover { background: var(--bg3); color: var(--fg); }
+
+/* ── Sections ── */
+section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+}
+section h2 {
+  font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--fg2); margin-bottom: 16px;
+}
+
+/* ── Field ── */
+.field { margin-bottom: 14px; }
+.field label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 8px; }
+.field-control { display: flex; align-items: center; gap: 12px; }
+input[type="range"] {
+  flex: 1; accent-color: var(--accent);
+}
+#historyDays-val { font-weight: 700; color: var(--accent); min-width: 60px; }
+
+/* ── Info box ── */
+.info-box {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 12px; color: var(--fg2); margin-bottom: 14px;
+}
+.info-box span { font-weight: 600; }
+
+/* ── Buttons ── */
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+button {
+  padding: 9px 18px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  border: 1px solid transparent; transition: opacity 0.15s;
+}
+button:hover { opacity: 0.85; }
+
+.btn-secondary {
+  background: var(--bg3); color: var(--fg);
+  border-color: var(--border);
+}
+.btn-danger {
+  background: rgba(254, 242, 242, 0.70); color: var(--red);
+  border-color: rgba(252, 165, 165, 0.38);
+}
+#btn-save {
+  background: rgba(117, 177, 131, 0.90); color: #fff;
+  border-color: rgba(117, 177, 131, 0.34);
+  padding: 10px 28px;
+}
+
+/* ── Toggle rows ── */
+.toggle-row {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-row > div { flex: 1; }
+.toggle-row label:first-child { font-weight: 600; font-size: 13px; }
+.toggle-row p { font-size: 12px; color: var(--fg2); margin-top: 2px; }
+
+/* ── Toggle switch ── */
+.toggle { position: relative; display: inline-flex; flex-shrink: 0; cursor: pointer; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.slider {
+  display: inline-block; width: 40px; height: 22px;
+  background: var(--bg3); border-radius: 11px;
+  border: 1px solid var(--border);
+  transition: background 0.2s;
+  position: relative;
+}
+.slider::before {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; top: 3px; left: 3px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle input:checked + .slider { background: var(--accent); }
+.toggle input:checked + .slider::before { transform: translateX(18px); }
+
+/* ── Save bar ── */
+#save-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  padding: 12px 20px;
+  background: var(--bg2); border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: none;
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+}
+#save-status { font-size: 12px; color: var(--green); font-weight: 600; }
+
+footer {
+  text-align: center;
+  font-size: 11px; color: var(--fg2);
+  padding: 16px 0 24px;
+}
+
+/* ── Confirm overlay ── */
+#confirm-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999;
+}
+#confirm-dialog {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  max-width: 360px; width: 90%;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+  backdrop-filter: blur(20px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+}
+#confirm-dialog h3 { font-size: 15px; margin-bottom: 8px; }
+#confirm-dialog p  { font-size: 13px; color: var(--fg2); margin-bottom: 20px; }

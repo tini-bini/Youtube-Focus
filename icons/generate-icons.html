@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<!--
+  RealDeal Icon Generator
+  Open this file in a browser, then download the generated PNG files.
+  Save them as icon16.png, icon48.png, and icon128.png in this folder.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RealDeal - Generate Icons</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --fg: #0f172a;
+      --muted: #64748b;
+      --accent: #75b183;
+      --accent-soft: #dfeee3;
+      --border: rgba(148, 163, 184, 0.22);
+      --shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 32px;
+      font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(117, 177, 131, 0.18), transparent 28%),
+        linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      color: var(--fg);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+
+    .lede {
+      max-width: 760px;
+      margin: 0 0 28px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .icon-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .icon-item {
+      min-width: 190px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .canvas-wrap {
+      display: inline-flex;
+      padding: 12px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at top left, rgba(117, 177, 131, 0.16), transparent 52%),
+        #eef2f6;
+    }
+
+    canvas {
+      display: block;
+      border-radius: 22%;
+      cursor: pointer;
+    }
+
+    p {
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>RealDeal Icon Generator</h1>
+  <p class="lede">
+    This generator matches the popup refresh: a polished dark glass badge, soft internal sheen,
+    and the RealDeal upward-check mark in the sage green brand palette so it reads clearly in the
+    Chrome toolbar, extension manager, and Chrome Web Store listings.
+  </p>
+
+  <div class="icon-group" id="icons"></div>
+
+  <script>
+    const sizes = [16, 48, 128];
+    const colors = {
+      bgA: '#132419',
+      bgB: '#0b120d',
+      bgC: '#1e3225',
+      accent: '#75b183',
+      accentSoft: '#eff8f1',
+      rim: 'rgba(255,255,255,0.10)',
+      glow: 'rgba(117,177,131,0.26)',
+      sheen: 'rgba(255,255,255,0.16)'
+    };
+
+    function roundedRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      const s = size;
+      const radius = s * 0.24;
+
+      ctx.clearRect(0, 0, s, s);
+
+      const bg = ctx.createLinearGradient(0, 0, s, s);
+      bg.addColorStop(0, colors.bgA);
+      bg.addColorStop(0.58, colors.bgB);
+      bg.addColorStop(1, colors.bgC);
+
+      roundedRect(ctx, 0, 0, s, s, radius);
+      ctx.fillStyle = bg;
+      ctx.fill();
+
+      const glow = ctx.createRadialGradient(s * 0.24, s * 0.2, 0, s * 0.24, s * 0.2, s * 0.64);
+      glow.addColorStop(0, colors.glow);
+      glow.addColorStop(1, 'rgba(117,177,131,0)');
+      ctx.fillStyle = glow;
+      ctx.fill();
+
+      const sheen = ctx.createLinearGradient(0, 0, s, s * 0.54);
+      sheen.addColorStop(0, colors.sheen);
+      sheen.addColorStop(1, 'rgba(255,255,255,0)');
+      roundedRect(ctx, s * 0.06, s * 0.06, s * 0.88, s * 0.42, s * 0.18);
+      ctx.fillStyle = sheen;
+      ctx.fill();
+
+      roundedRect(ctx, 0.5, 0.5, s - 1, s - 1, radius);
+      ctx.strokeStyle = colors.rim;
+      ctx.lineWidth = Math.max(1, s * 0.035);
+      ctx.stroke();
+
+      ctx.strokeStyle = colors.accent;
+      ctx.lineWidth = Math.max(2, s * 0.125);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(s * 0.28, s * 0.585);
+      ctx.lineTo(s * 0.425, s * 0.715);
+      ctx.lineTo(s * 0.72, s * 0.425);
+      ctx.stroke();
+
+      ctx.strokeStyle = colors.accentSoft;
+      ctx.lineWidth = Math.max(1.6, s * 0.095);
+      ctx.beginPath();
+      ctx.moveTo(s * 0.58, s * 0.425);
+      ctx.lineTo(s * 0.72, s * 0.425);
+      ctx.lineTo(s * 0.72, s * 0.565);
+      ctx.stroke();
+    }
+
+    sizes.forEach(size => {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      drawIcon(canvas, size);
+
+      const div = document.createElement('div');
+      div.className = 'icon-item';
+
+      const canvasWrap = document.createElement('div');
+      canvasWrap.className = 'canvas-wrap';
+      canvasWrap.appendChild(canvas);
+
+      const label = document.createElement('p');
+      label.textContent = size + 'x' + size;
+
+      const btn = document.createElement('button');
+      btn.textContent = 'Download icon' + size + '.png';
+      btn.addEventListener('click', () => {
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'icon' + size + '.png';
+        a.click();
+      });
+
+      div.appendChild(canvasWrap);
+      div.appendChild(label);
+      div.appendChild(btn);
+      document.getElementById('icons').appendChild(div);
+    });
+  </script>
+</body>
+</html>

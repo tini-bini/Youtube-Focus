@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RealDeal — Settings</title>
+  <link rel="stylesheet" href="settings.css">
+  <script>(function(){var t=localStorage.getItem('rd_theme');if(t)document.documentElement.dataset.theme=t;})();</script>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div id="logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="2.5" y="2.5" width="19" height="19" rx="6" fill="#0f172a"></rect>
+          <path d="M6.8 14.1L10.2 17.2L17.2 10.2" stroke="#75b183" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M13.8 10.2H17.2V13.6" stroke="#dfeee3" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span>RealDeal — Settings</span>
+      </div>
+      <button id="theme-toggle" title="Toggle dark/light mode">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </header>
+
+    <main>
+
+      <!-- History settings -->
+      <section>
+        <h2>Price History</h2>
+
+        <div class="field">
+          <label for="historyDays">Keep price history for</label>
+          <div class="field-control">
+            <input type="range" id="historyDays" min="7" max="365" step="1" value="90">
+            <span id="historyDays-val">90 days</span>
+          </div>
+        </div>
+
+        <div id="storage-stats" class="info-box">
+          <span id="stat-products">0 products</span>
+          <span id="stat-obs">0 observations</span>
+        </div>
+
+        <div class="btn-row">
+          <button id="btn-export" class="btn-secondary">Export CSV</button>
+          <button id="btn-clear" class="btn-danger">Clear All History</button>
+        </div>
+      </section>
+
+      <!-- UI settings -->
+      <section>
+        <h2>Interface</h2>
+
+        <div class="toggle-row">
+          <div>
+            <label>Show floating badge</label>
+            <p>Displays the Trust Score badge on product pages</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="showBadge" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <label>Show inline price label</label>
+            <p>Injects "Lowest ever: $X" near the price on the page</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="showInlineLabel" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Detection toggles -->
+      <section>
+        <h2>Trick Detections</h2>
+
+        <div class="toggle-row">
+          <div>
+            <label>Fake "Was" Price</label>
+            <p>Flag items that have been "on sale" for most of their tracked history</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="enableFakeWasDetection" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <label>Inflated Original Price</label>
+            <p>Detect when the "original" price was never actually charged</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="enablePriceAnchorDetection" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <label>Artificial Urgency</label>
+            <p>Detect countdown timers and "Only X left!" messages</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="enableUrgencyDetection" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <label>Pre-Sale Price Spike</label>
+            <p>Detect prices that were temporarily raised before a sale</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="enableRollbackDetection" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <label>Subscription Price Disguise</label>
+            <p>Flag monthly/recurring prices that look like one-time prices</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="enableSubscriptionDetection" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </section>
+
+    </main>
+
+    <div id="save-bar">
+      <span id="save-status"></span>
+      <button id="btn-save">Save Settings</button>
+    </div>
+
+    <footer>
+      <span>RealDeal v1.0.0 — All data stored locally. No data is ever sent to external servers.</span>
+    </footer>
+  </div>
+
+  <!-- Clear history confirm dialog -->
+  <div id="confirm-overlay" style="display:none">
+    <div id="confirm-dialog">
+      <h3>Clear All Price History?</h3>
+      <p>This will permanently delete all tracked price data. This cannot be undone.</p>
+      <div class="btn-row">
+        <button id="confirm-cancel" class="btn-secondary">Cancel</button>
+        <button id="confirm-ok"     class="btn-danger">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

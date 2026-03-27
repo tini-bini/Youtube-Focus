@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RealDeal</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="popup-shell">
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <header class="topbar glass-panel">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="2.5" y="2.5" width="19" height="19" rx="6" fill="url(#brand-fill)"></rect>
+            <path d="M6.8 14.1L10.2 17.2L17.2 10.2" stroke="#75b183" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M13.8 10.2H17.2V13.6" stroke="#eff8f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <defs>
+              <linearGradient id="brand-fill" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#132419"></stop>
+                <stop offset="1" stop-color="#0b120d"></stop>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <p class="eyebrow">Deal intelligence</p>
+          <h1>RealDeal</h1>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle theme"></button>
+        <button id="settings-btn" class="icon-button" type="button" aria-label="Open settings">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.607 2.296.07 2.572-1.065Z" stroke="currentColor" stroke-width="1.6"></path>
+            <path d="M12 15.25A3.25 3.25 0 1 0 12 8.75a3.25 3.25 0 0 0 0 6.5Z" stroke="currentColor" stroke-width="1.6"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="popup-main">
+      <section id="state-loading" class="glass-panel state-panel">
+        <div class="loader-orb" aria-hidden="true"></div>
+        <div class="state-copy">
+          <h2>Scanning this page</h2>
+          <p>Pulling live pricing signals, history, and fake-sale checks.</p>
+        </div>
+      </section>
+
+      <section id="state-no-product" class="glass-panel state-panel hidden">
+        <div class="empty-art" aria-hidden="true">
+          <span></span>
+        </div>
+        <div class="state-copy">
+          <h2>No product page detected</h2>
+          <p>Open a supported store product page to unlock the trust score, pricing history, and quick actions.</p>
+        </div>
+        <div class="state-tags">
+          <span class="soft-pill">Amazon</span>
+          <span class="soft-pill">Zalando</span>
+          <span class="soft-pill">eBay</span>
+          <span class="soft-pill">Walmart</span>
+        </div>
+      </section>
+
+      <section id="state-product" class="product-stack hidden">
+        <section class="glass-panel hero-panel">
+          <div class="hero-head">
+            <span id="site-pill" class="status-pill">Active page</span>
+            <span id="history-pill" class="status-pill subtle">Tracking</span>
+          </div>
+
+          <div class="hero-body">
+            <div id="score-orb" class="score-orb">
+              <span class="score-caption">Trust</span>
+              <span id="score-value" class="score-value">--</span>
+            </div>
+
+            <div class="hero-copy">
+              <p class="eyebrow">Deal trust score</p>
+              <h2 id="score-cat">Loading</h2>
+              <p id="score-verdict" class="hero-verdict"></p>
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric-tile">
+              <span class="metric-label">Current</span>
+              <strong id="current-price" class="metric-value">--</strong>
+              <span id="original-price" class="metric-note">No anchor price</span>
+            </article>
+
+            <article class="metric-tile">
+              <span class="metric-label">Lowest tracked</span>
+              <strong id="lowest-price" class="metric-value">--</strong>
+              <span id="lowest-note" class="metric-note">Live benchmark</span>
+            </article>
+
+            <article class="metric-tile">
+              <span class="metric-label">Discount reality</span>
+              <strong id="discount-value" class="metric-value">--</strong>
+              <span id="discount-note" class="metric-note">Waiting for history</span>
+            </article>
+
+            <article class="metric-tile">
+              <span class="metric-label">Price stability</span>
+              <strong id="stability-value" class="metric-value">--</strong>
+              <span id="stability-note" class="metric-note">Waiting for history</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="glass-panel product-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Current product</p>
+              <h3>Live context</h3>
+            </div>
+            <span id="product-site" class="soft-pill">Store</span>
+          </div>
+          <h2 id="product-name" class="product-name"></h2>
+          <p id="product-summary" class="supporting-text"></p>
+        </section>
+
+        <section class="glass-panel insights-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Retailer signals</p>
+              <h3>Detected patterns</h3>
+            </div>
+            <span id="tricks-count" class="soft-pill">0 flags</span>
+          </div>
+          <div id="tricks-list" class="insight-list"></div>
+        </section>
+      </section>
+
+      <section class="glass-panel utility-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Quick controls</p>
+            <h3>Popup actions</h3>
+          </div>
+          <span id="footer-stats" class="soft-pill">0 tracked</span>
+        </div>
+
+        <div class="toggle-list">
+          <label class="toggle-row" for="toggle-badge">
+            <div class="toggle-copy">
+              <span class="toggle-title">Floating badge</span>
+              <span class="toggle-text">Keep the on-page trust score visible while you browse.</span>
+            </div>
+            <span class="switch">
+              <input id="toggle-badge" type="checkbox">
+              <span class="switch-track"></span>
+            </span>
+          </label>
+
+          <label class="toggle-row" for="toggle-inline-label">
+            <div class="toggle-copy">
+              <span class="toggle-title">Inline lowest price</span>
+              <span class="toggle-text">Inject the lowest tracked price directly beside the listing price.</span>
+            </div>
+            <span class="switch">
+              <input id="toggle-inline-label" type="checkbox">
+              <span class="switch-track"></span>
+            </span>
+          </label>
+
+          <label class="toggle-row" for="toggle-urgency">
+            <div class="toggle-copy">
+              <span class="toggle-title">Urgency detection</span>
+              <span class="toggle-text">Flag countdown timers and pressure cues in the live page.</span>
+            </div>
+            <span class="switch">
+              <input id="toggle-urgency" type="checkbox">
+              <span class="switch-track"></span>
+            </span>
+          </label>
+        </div>
+
+        <div id="target-card" class="target-card is-disabled">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">Price target</p>
+              <h3>Watch this product</h3>
+            </div>
+            <span id="target-currency" class="soft-pill">USD</span>
+          </div>
+
+          <div class="input-row">
+            <label class="field">
+              <span class="field-label">Notify yourself at a better number</span>
+              <div class="input-shell">
+                <span id="target-prefix" class="input-prefix">$</span>
+                <input id="target-price-input" type="number" min="0" step="0.01" inputmode="decimal" placeholder="149.00">
+              </div>
+            </label>
+            <button id="save-target-btn" class="btn btn-primary" type="button">Save target</button>
+          </div>
+
+          <div class="target-footer">
+            <p id="target-status" class="supporting-text">Open a product page to save a target price.</p>
+            <button id="clear-target-btn" class="btn btn-secondary btn-small hidden" type="button">Clear</button>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button id="btn-open-panel" class="btn btn-primary" type="button">Open full analysis</button>
+          <button id="btn-open-settings" class="btn btn-secondary" type="button">Settings</button>
+        </div>
+
+        <footer class="popup-footer">
+          <span id="footer-note">All pricing history stays local on this device.</span>
+        </footer>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
+</body>
+</html>

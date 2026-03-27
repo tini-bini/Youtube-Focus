@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "RealDeal — Fake Sale Detector",
+  "short_name": "RealDeal",
+  "version": "1.0.0",
+  "description": "Detect fake sales and retailer pricing tricks. See real price history and get a Deal Trust Score on every product page.",
+  "permissions": ["storage", "activeTab", "scripting", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "content/utils.js",
+        "content/storage.js",
+        "content/scrapers/base.js",
+        "content/scrapers/amazon.js",
+        "content/scrapers/walmart.js",
+        "content/scrapers/ebay.js",
+        "content/scrapers/aliexpress.js",
+        "content/scrapers/zalando.js",
+        "content/scrapers/aboutyou.js",
+        "content/scrapers/zara.js",
+        "content/scrapers/hm.js",
+        "content/scrapers/generic.js",
+        "content/scrapers/index.js",
+        "content/analyzers/trick-detector.js",
+        "content/analyzers/trust-score.js",
+        "content/ui/badge.js",
+        "content/ui/sidepanel.js",
+        "content/main.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "RealDeal — Fake Sale Detector"
+  },
+  "options_page": "settings/settings.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

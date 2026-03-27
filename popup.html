@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#75b183" />
+    <title>YouTube Focus</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-a" aria-hidden="true"></div>
+    <div class="ambient ambient-b" aria-hidden="true"></div>
+
+    <main class="popup-shell">
+      <header class="topbar glass-panel">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <img src="assets/logo.svg" alt="" />
+          </span>
+          <div class="brand-copy">
+            <p class="eyebrow">Intentional browsing</p>
+            <h1 class="brand-title">YouTube Focus</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="plan-chip" id="plan-chip">Free</span>
+          <button
+            class="icon-button"
+            id="theme-toggle-button"
+            type="button"
+            aria-label="Toggle theme"
+          ></button>
+        </div>
+      </header>
+
+      <section class="hero glass-panel" aria-labelledby="focus-cockpit-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Focus cockpit</p>
+          <h2 class="hero-title" id="focus-cockpit-title">Cut the noise before the tab even loads.</h2>
+          <p class="hero-text" id="hero-description">
+            Dial in the YouTube surfaces you want gone, keep a clear intention in view,
+            and browse with less drag.
+          </p>
+        </div>
+
+        <div class="hero-stats">
+          <article class="stat-card">
+            <span class="stat-value" id="active-count">0</span>
+            <span class="stat-label">shields active</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-value" id="plan-value">Free</span>
+            <span class="stat-label">current tier</span>
+          </article>
+        </div>
+
+        <div class="coverage" aria-label="Protection coverage">
+          <div class="coverage-meta">
+            <span id="coverage-label">0% protected</span>
+            <span id="preset-label">Flow 60</span>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <span class="progress-bar" id="coverage-bar"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-card glass-panel" aria-labelledby="shields-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Controls</p>
+            <h2 class="section-title" id="shields-title">Distraction shields</h2>
+            <p class="section-subtitle">Every switch updates YouTube instantly across open tabs.</p>
+          </div>
+          <span class="meta-pill section-count" id="shield-summary">0 of 4 armed</span>
+        </div>
+
+        <div class="settings-list">
+          <label class="setting-row" for="hideHomeFeed" data-setting-card="hideHomeFeed">
+            <span class="setting-copy">
+              <span class="setting-title-row">
+                <span class="setting-title">Homepage feed</span>
+                <span class="setting-tag">Free</span>
+              </span>
+              <p class="setting-text">Replace the recommendation wall with a calm focus state.</p>
+            </span>
+            <span class="switch">
+              <input id="hideHomeFeed" type="checkbox" data-setting="hideHomeFeed" />
+              <span class="track" aria-hidden="true"></span>
+            </span>
+          </label>
+
+          <label class="setting-row" for="hideShorts" data-setting-card="hideShorts">
+            <span class="setting-copy">
+              <span class="setting-title-row">
+                <span class="setting-title">Shorts</span>
+                <span class="setting-tag">Free</span>
+              </span>
+              <p class="setting-text">Hide Shorts shelves, links, and quick-hit rabbit holes.</p>
+            </span>
+            <span class="switch">
+              <input id="hideShorts" type="checkbox" data-setting="hideShorts" />
+              <span class="track" aria-hidden="true"></span>
+            </span>
+          </label>
+
+          <label
+            class="setting-row"
+            for="hideComments"
+            data-setting-card="hideComments"
+            data-requires-premium="true"
+          >
+            <span class="setting-copy">
+              <span class="setting-title-row">
+                <span class="setting-title">Comments</span>
+                <span class="setting-tag is-pro">Pro</span>
+              </span>
+              <p class="setting-text">Mute the discussion layer on watch pages when you need flow.</p>
+            </span>
+            <span class="switch">
+              <input id="hideComments" type="checkbox" data-setting="hideComments" />
+              <span class="track" aria-hidden="true"></span>
+            </span>
+          </label>
+
+          <label
+            class="setting-row"
+            for="hideSidebar"
+            data-setting-card="hideSidebar"
+            data-requires-premium="true"
+          >
+            <span class="setting-copy">
+              <span class="setting-title-row">
+                <span class="setting-title">Sidebar recommendations</span>
+                <span class="setting-tag is-pro">Pro</span>
+              </span>
+              <p class="setting-text">Strip the watch-page rail so there is less to drift into next.</p>
+            </span>
+            <span class="switch">
+              <input id="hideSidebar" type="checkbox" data-setting="hideSidebar" />
+              <span class="track" aria-hidden="true"></span>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <section class="section-card glass-panel" aria-labelledby="rituals-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Ritual</p>
+            <h2 class="section-title" id="rituals-title">Focus setup</h2>
+            <p class="section-subtitle">A lightweight prompt that keeps the popup useful, not decorative.</p>
+          </div>
+        </div>
+
+        <label class="field" for="focus-intention">
+          <span class="field-label">Current intention</span>
+          <input
+            class="text-input"
+            id="focus-intention"
+            type="text"
+            maxlength="72"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </label>
+
+        <div class="preset-grid" role="list" aria-label="Quick focus presets">
+          <button class="preset-button" id="preset-sprint" type="button" data-preset-button="sprint">
+            <span class="preset-name">Sprint 30</span>
+            <span class="preset-copy">Fast intentional check-ins.</span>
+          </button>
+          <button class="preset-button" id="preset-flow" type="button" data-preset-button="flow">
+            <span class="preset-name">Flow 60</span>
+            <span class="preset-copy">Balanced default for real work.</span>
+          </button>
+          <button class="preset-button" id="preset-always" type="button" data-preset-button="always">
+            <span class="preset-name">Always on</span>
+            <span class="preset-copy">Keep the clean state persistent.</span>
+          </button>
+        </div>
+
+        <p class="field-hint">
+          The intention and preset are saved locally so the popup opens with your current target.
+        </p>
+      </section>
+
+      <section class="action-grid" aria-label="Primary actions">
+        <button class="button button-primary" id="monk-mode-button" type="button">Enable Monk Mode</button>
+        <button class="button button-secondary" id="upgrade-button" type="button">Open Checkout</button>
+        <button class="button button-ghost" id="activate-button" type="button">Unlock on This Browser</button>
+      </section>
+
+      <footer class="footer-bar glass-panel">
+        <button class="support-button" id="donate-button" type="button">Support the project</button>
+        <p class="status-text" id="status-text" aria-live="polite"></p>
+      </footer>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

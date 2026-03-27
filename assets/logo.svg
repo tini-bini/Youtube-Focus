@@ -1,0 +1,36 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="badgeGradient" x1="18" y1="16" x2="108" y2="114" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#B8DCC1"/>
+      <stop offset="0.48" stop-color="#75B183"/>
+      <stop offset="1" stop-color="#4F815D"/>
+    </linearGradient>
+    <linearGradient id="glassWash" x1="32" y1="18" x2="89" y2="81" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.58"/>
+      <stop offset="0.56" stop-color="#FFFFFF" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="22" y1="18" x2="82" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7FFF8" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#F7FFF8" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="shadow" x="6" y="8" width="116" height="118" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="6"/>
+      <feGaussianBlur stdDeviation="6"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.0666667 0 0 0 0 0.145098 0 0 0 0 0.0941176 0 0 0 0.24 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_2"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_2" result="shape"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <rect x="14" y="14" width="100" height="100" rx="28" fill="url(#badgeGradient)"/>
+    <rect x="15" y="15" width="98" height="98" rx="27" stroke="#FFFFFF" stroke-opacity="0.22"/>
+    <path d="M26 42C26 28.7452 36.7452 18 50 18H91C79.0221 18 68.4358 24.6296 62.931 34.4288C58.6983 41.9656 50.7427 47 41.6116 47H26V42Z" fill="url(#sheen)"/>
+    <rect x="24" y="24" width="80" height="80" rx="22" fill="url(#glassWash)"/>
+    <path d="M34 37.5C34 32.2533 38.2533 28 43.5 28H61.5C66.7467 28 71 32.2533 71 37.5C71 42.7467 66.7467 47 61.5 47H50V90C50 95.5228 45.5228 100 40 100C36.6863 100 34 97.3137 34 94V37.5Z" fill="#F8FFF9"/>
+    <path d="M55 53.5823C55 48.6225 60.3952 45.5591 64.6404 48.0966L89.2199 62.7898C93.3322 65.2479 93.3322 71.1972 89.2199 73.6553L64.6404 88.3484C60.3952 90.8859 55 87.8226 55 82.8628V53.5823Z" fill="#F8FFF9"/>
+  </g>
+</svg>

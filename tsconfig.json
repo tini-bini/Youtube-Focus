@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
+    "types": ["chrome", "node", "vitest/globals"]
+  },
+  "include": ["*.js", "scripts/**/*.mjs", "tests/**/*.mjs", "types/**/*.d.ts"],
+  "exclude": ["dist", "node_modules", "checkout"]
+}

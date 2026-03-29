@@ -10,6 +10,7 @@
   <body>
     <div class="ambient ambient-a" aria-hidden="true"></div>
     <div class="ambient ambient-b" aria-hidden="true"></div>
+    <div class="ambient ambient-c" aria-hidden="true"></div>
 
     <main class="popup-shell">
       <header class="topbar glass-panel">
@@ -22,6 +23,7 @@
             <h1 class="brand-title">YouTube Focus</h1>
           </div>
         </div>
+
         <div class="topbar-actions">
           <span class="plan-chip" id="plan-chip">Free</span>
           <button
@@ -33,35 +35,85 @@
         </div>
       </header>
 
-      <section class="hero glass-panel" aria-labelledby="focus-cockpit-title">
+      <section class="hero glass-panel" aria-labelledby="hero-title">
         <div class="hero-copy">
+          <div class="hero-pills">
+            <span class="meta-pill" id="session-pill">Live</span>
+            <span class="meta-pill meta-pill-subtle" id="profile-pill">Flow</span>
+          </div>
           <p class="eyebrow">Focus cockpit</p>
-          <h2 class="hero-title" id="focus-cockpit-title">Cut the noise before the tab even loads.</h2>
+          <h2 class="hero-title" id="hero-title">Run YouTube like a tool, not a slot machine.</h2>
           <p class="hero-text" id="hero-description">
-            Dial in the YouTube surfaces you want gone, keep a clear intention in view,
-            and browse with less drag.
+            Use shield profiles, automation windows, and a page allowlist to keep the surface intentional by default.
           </p>
         </div>
 
         <div class="hero-stats">
           <article class="stat-card">
             <span class="stat-value" id="active-count">0</span>
-            <span class="stat-label">shields active</span>
+            <span class="stat-label">shields live</span>
           </article>
           <article class="stat-card">
-            <span class="stat-value" id="plan-value">Free</span>
-            <span class="stat-label">current tier</span>
+            <span class="stat-value stat-value-small" id="plan-value">Free plan</span>
+            <span class="stat-label">access tier</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-value stat-value-small" id="session-value">Live</span>
+            <span class="stat-label">session state</span>
           </article>
         </div>
 
         <div class="coverage" aria-label="Protection coverage">
           <div class="coverage-meta">
-            <span id="coverage-label">0% protected</span>
-            <span id="preset-label">Flow 60</span>
+            <span id="coverage-label">0% of shields live</span>
+            <span id="shield-summary">0 of 7 armed</span>
           </div>
           <div class="progress-track" aria-hidden="true">
             <span class="progress-bar" id="coverage-bar"></span>
           </div>
+        </div>
+
+        <div class="hero-note">
+          <label class="field" for="focus-intention">
+            <span class="field-label">Current intention</span>
+            <input
+              class="text-input"
+              id="focus-intention"
+              type="text"
+              maxlength="72"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Research camera setup for client shoot"
+            />
+          </label>
+          <p class="hero-note-preview" id="focus-preview">
+            Add a quick intention so the popup and homepage both reinforce why you opened YouTube.
+          </p>
+        </div>
+      </section>
+
+      <section class="section-card glass-panel" aria-labelledby="profiles-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Profiles</p>
+            <h2 class="section-title" id="profiles-title">Recommended setups</h2>
+            <p class="section-subtitle">Apply a prebuilt stack, then fine-tune any shield below.</p>
+          </div>
+        </div>
+
+        <div class="profile-grid" role="list" aria-label="Protection profiles">
+          <button class="profile-card" type="button" data-profile-button="essentials">
+            <span class="profile-name">Essentials</span>
+            <span class="profile-copy">Trim the biggest time sinks.</span>
+          </button>
+          <button class="profile-card" type="button" data-profile-button="flow">
+            <span class="profile-name">Flow</span>
+            <span class="profile-copy">Balanced default for everyday intent.</span>
+          </button>
+          <button class="profile-card" type="button" data-profile-button="deepWork">
+            <span class="profile-name">Deep Work</span>
+            <span class="profile-copy">Arm every available shield.</span>
+          </button>
         </div>
       </section>
 
@@ -70,19 +122,20 @@
           <div>
             <p class="eyebrow">Controls</p>
             <h2 class="section-title" id="shields-title">Distraction shields</h2>
-            <p class="section-subtitle">Every switch updates YouTube instantly across open tabs.</p>
+            <p class="section-subtitle">The first two are free. The rest unlock with Pro.</p>
           </div>
-          <span class="meta-pill section-count" id="shield-summary">0 of 4 armed</span>
+          <span class="meta-pill meta-pill-subtle section-count">Keys 1-7</span>
         </div>
 
         <div class="settings-list">
           <label class="setting-row" for="hideHomeFeed" data-setting-card="hideHomeFeed">
             <span class="setting-copy">
               <span class="setting-title-row">
+                <span class="setting-index">1</span>
                 <span class="setting-title">Homepage feed</span>
                 <span class="setting-tag">Free</span>
               </span>
-              <p class="setting-text">Replace the recommendation wall with a calm focus state.</p>
+              <p class="setting-text">Replace the recommendation wall with a calmer landing state.</p>
             </span>
             <span class="switch">
               <input id="hideHomeFeed" type="checkbox" data-setting="hideHomeFeed" />
@@ -93,10 +146,11 @@
           <label class="setting-row" for="hideShorts" data-setting-card="hideShorts">
             <span class="setting-copy">
               <span class="setting-title-row">
+                <span class="setting-index">2</span>
                 <span class="setting-title">Shorts</span>
                 <span class="setting-tag">Free</span>
               </span>
-              <p class="setting-text">Hide Shorts shelves, links, and quick-hit rabbit holes.</p>
+              <p class="setting-text">Remove Shorts shelves, links, and quick-hit loops.</p>
             </span>
             <span class="switch">
               <input id="hideShorts" type="checkbox" data-setting="hideShorts" />
@@ -104,18 +158,14 @@
             </span>
           </label>
 
-          <label
-            class="setting-row"
-            for="hideComments"
-            data-setting-card="hideComments"
-            data-requires-premium="true"
-          >
+          <label class="setting-row" for="hideComments" data-setting-card="hideComments">
             <span class="setting-copy">
               <span class="setting-title-row">
+                <span class="setting-index">3</span>
                 <span class="setting-title">Comments</span>
                 <span class="setting-tag is-pro">Pro</span>
               </span>
-              <p class="setting-text">Mute the discussion layer on watch pages when you need flow.</p>
+              <p class="setting-text">Quiet the discussion layer on watch pages.</p>
             </span>
             <span class="switch">
               <input id="hideComments" type="checkbox" data-setting="hideComments" />
@@ -123,72 +173,175 @@
             </span>
           </label>
 
-          <label
-            class="setting-row"
-            for="hideSidebar"
-            data-setting-card="hideSidebar"
-            data-requires-premium="true"
-          >
+          <label class="setting-row" for="hideSidebar" data-setting-card="hideSidebar">
             <span class="setting-copy">
               <span class="setting-title-row">
+                <span class="setting-index">4</span>
                 <span class="setting-title">Sidebar recommendations</span>
                 <span class="setting-tag is-pro">Pro</span>
               </span>
-              <p class="setting-text">Strip the watch-page rail so there is less to drift into next.</p>
+              <p class="setting-text">Strip the watch-next rail to reduce drift.</p>
             </span>
             <span class="switch">
               <input id="hideSidebar" type="checkbox" data-setting="hideSidebar" />
               <span class="track" aria-hidden="true"></span>
             </span>
           </label>
+
+          <label class="setting-row" for="hideExplore" data-setting-card="hideExplore">
+            <span class="setting-copy">
+              <span class="setting-title-row">
+                <span class="setting-index">5</span>
+                <span class="setting-title">Explore navigation</span>
+                <span class="setting-tag is-pro">Pro</span>
+              </span>
+              <p class="setting-text">Hide Explore and Trending entry points from the side rails.</p>
+            </span>
+            <span class="switch">
+              <input id="hideExplore" type="checkbox" data-setting="hideExplore" />
+              <span class="track" aria-hidden="true"></span>
+            </span>
+          </label>
+
+          <label class="setting-row" for="hideNotifications" data-setting-card="hideNotifications">
+            <span class="setting-copy">
+              <span class="setting-title-row">
+                <span class="setting-index">6</span>
+                <span class="setting-title">Notifications</span>
+                <span class="setting-tag is-pro">Pro</span>
+              </span>
+              <p class="setting-text">Remove the notification bell and notification menu surfaces.</p>
+            </span>
+            <span class="switch">
+              <input id="hideNotifications" type="checkbox" data-setting="hideNotifications" />
+              <span class="track" aria-hidden="true"></span>
+            </span>
+          </label>
+
+          <label class="setting-row" for="hideTopicChips" data-setting-card="hideTopicChips">
+            <span class="setting-copy">
+              <span class="setting-title-row">
+                <span class="setting-index">7</span>
+                <span class="setting-title">Topic chips</span>
+                <span class="setting-tag is-pro">Pro</span>
+              </span>
+              <p class="setting-text">Hide chip bars and topic nudges that keep sessions going.</p>
+            </span>
+            <span class="switch">
+              <input id="hideTopicChips" type="checkbox" data-setting="hideTopicChips" />
+              <span class="track" aria-hidden="true"></span>
+            </span>
+          </label>
         </div>
       </section>
 
-      <section class="section-card glass-panel" aria-labelledby="rituals-title">
+      <section class="section-card glass-panel" aria-labelledby="automation-title">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Ritual</p>
-            <h2 class="section-title" id="rituals-title">Focus setup</h2>
-            <p class="section-subtitle">A lightweight prompt that keeps the popup useful, not decorative.</p>
+            <p class="eyebrow">Automation</p>
+            <h2 class="section-title" id="automation-title">Schedule and exceptions</h2>
+            <p class="section-subtitle" id="schedule-summary">
+              Focus runs all day until you turn on a schedule.
+            </p>
           </div>
         </div>
 
-        <label class="field" for="focus-intention">
-          <span class="field-label">Current intention</span>
-          <input
-            class="text-input"
-            id="focus-intention"
-            type="text"
-            maxlength="72"
-            autocomplete="off"
-            spellcheck="false"
-          />
+        <label class="setting-row setting-row-compact" for="schedule-enabled">
+          <span class="setting-copy">
+            <span class="setting-title-row">
+              <span class="setting-title">Scheduled focus window</span>
+            </span>
+            <p class="setting-text">Only keep shields live during the hours and days you choose.</p>
+          </span>
+          <span class="switch">
+            <input id="schedule-enabled" type="checkbox" />
+            <span class="track" aria-hidden="true"></span>
+          </span>
         </label>
 
-        <div class="preset-grid" role="list" aria-label="Quick focus presets">
-          <button class="preset-button" id="preset-sprint" type="button" data-preset-button="sprint">
-            <span class="preset-name">Sprint 30</span>
-            <span class="preset-copy">Fast intentional check-ins.</span>
-          </button>
-          <button class="preset-button" id="preset-flow" type="button" data-preset-button="flow">
-            <span class="preset-name">Flow 60</span>
-            <span class="preset-copy">Balanced default for real work.</span>
-          </button>
-          <button class="preset-button" id="preset-always" type="button" data-preset-button="always">
-            <span class="preset-name">Always on</span>
-            <span class="preset-copy">Keep the clean state persistent.</span>
-          </button>
+        <div class="time-grid">
+          <label class="field" for="schedule-start">
+            <span class="field-label">Start</span>
+            <input class="text-input time-input" id="schedule-start" type="time" />
+          </label>
+          <label class="field" for="schedule-end">
+            <span class="field-label">End</span>
+            <input class="text-input time-input" id="schedule-end" type="time" />
+          </label>
         </div>
 
-        <p class="field-hint">
-          The intention and preset are saved locally so the popup opens with your current target.
-        </p>
+        <div class="day-grid" aria-label="Active schedule days">
+          <button class="day-button" type="button" data-day-button="1">M</button>
+          <button class="day-button" type="button" data-day-button="2">T</button>
+          <button class="day-button" type="button" data-day-button="3">W</button>
+          <button class="day-button" type="button" data-day-button="4">T</button>
+          <button class="day-button" type="button" data-day-button="5">F</button>
+          <button class="day-button" type="button" data-day-button="6">S</button>
+          <button class="day-button" type="button" data-day-button="0">S</button>
+        </div>
+
+        <label class="field" for="allowlist-input">
+          <span class="field-label">Allowlist</span>
+          <textarea
+            class="text-area"
+            id="allowlist-input"
+            rows="4"
+            spellcheck="false"
+            placeholder="@yourchannel&#10;/feed/subscriptions&#10;youtube.com/watch?v=example"
+          ></textarea>
+        </label>
+
+        <p class="field-hint" id="allowlist-count">No allowlist rules yet.</p>
       </section>
 
-      <section class="action-grid" aria-label="Primary actions">
-        <button class="button button-primary" id="monk-mode-button" type="button">Enable Monk Mode</button>
-        <button class="button button-secondary" id="upgrade-button" type="button">Open Checkout</button>
-        <button class="button button-ghost" id="activate-button" type="button">Unlock on This Browser</button>
+      <section class="section-card glass-panel" aria-labelledby="tools-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Control</p>
+            <h2 class="section-title" id="tools-title">Session, backup, and insights</h2>
+            <p class="section-subtitle" id="session-subtitle">
+              Use snooze when you intentionally want the full site back for a short window.
+            </p>
+          </div>
+        </div>
+
+        <div class="session-row">
+          <p class="session-hint" id="session-countdown">
+            Shortcuts: / focus note, 1-7 shields, M Deep Work, S snooze.
+          </p>
+          <button class="button button-secondary" id="session-button" type="button">Snooze 15 Min</button>
+        </div>
+
+        <div class="button-row">
+          <button class="button button-secondary" id="export-button" type="button">Export Backup</button>
+          <button class="button button-secondary" id="import-button" type="button">Import Backup</button>
+          <input id="import-input" type="file" accept="application/json" hidden />
+        </div>
+
+        <div class="insight-grid">
+          <article class="insight-card">
+            <span class="insight-value" id="analytics-views">0</span>
+            <span class="insight-label">protected views</span>
+          </article>
+          <article class="insight-card">
+            <span class="insight-value" id="analytics-allowlist">0</span>
+            <span class="insight-label">allowlist hits</span>
+          </article>
+          <article class="insight-card">
+            <span class="insight-value" id="analytics-snoozes">0</span>
+            <span class="insight-label">snoozes used</span>
+          </article>
+          <article class="insight-card">
+            <span class="insight-value" id="analytics-exports">0</span>
+            <span class="insight-label">backups run</span>
+          </article>
+        </div>
+
+        <div class="action-grid" aria-label="Primary actions">
+          <button class="button button-primary" id="monk-mode-button" type="button">Enable Deep Work</button>
+          <button class="button button-secondary" id="upgrade-button" type="button">Upgrade to Pro</button>
+          <button class="button button-ghost" id="activate-button" type="button">I've Paid - Unlock Here</button>
+        </div>
       </section>
 
       <footer class="footer-bar glass-panel">
@@ -197,6 +350,7 @@
       </footer>
     </main>
 
+    <script src="shared.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

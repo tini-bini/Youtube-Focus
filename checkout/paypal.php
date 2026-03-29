@@ -167,17 +167,13 @@ function paypalCurlRequest(string $url, string $method, array $options = []): ar
     $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
 
-    $decoded = json_decode($rawBody, true);
+    $decoded = decodeJsonArray($rawBody, 'PayPal returned an invalid response.');
 
     if ($statusCode < 200 || $statusCode >= 300) {
-      $message = is_array($decoded) && !empty($decoded['message'])
-          ? $decoded['message']
-          : 'Unexpected PayPal API error.';
-      throw new RuntimeException($message);
-    }
-
-    if (!is_array($decoded)) {
-        throw new RuntimeException('PayPal returned an invalid response.');
+        $message = !empty($decoded['message'])
+            ? $decoded['message']
+            : 'Unexpected PayPal API error.';
+        throw new RuntimeException($message);
     }
 
     return $decoded;
@@ -191,13 +187,7 @@ function jsonInput(): array
         return [];
     }
 
-    $decoded = json_decode($rawBody, true);
-
-    if (!is_array($decoded)) {
-        throw new RuntimeException('Invalid JSON body.');
-    }
-
-    return $decoded;
+    return decodeJsonArray($rawBody, 'Invalid JSON body.');
 }
 
 function validateAmount(string $amount): string
@@ -221,4 +211,19 @@ function jsonResponse(array $payload, int $statusCode = 200): void
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode($payload, JSON_UNESCAPED_SLASHES);
     exit;
+}
+
+function decodeJsonArray(string $rawJson, string $errorMessage): array
+{
+    try {
+        $decoded = json_decode($rawJson, true, 512, JSON_THROW_ON_ERROR);
+    } catch (JsonException $exception) {
+        throw new RuntimeException($errorMessage, 0, $exception);
+    }
+
+    if (!is_array($decoded)) {
+        throw new RuntimeException($errorMessage);
+    }
+
+    return $decoded;
 }

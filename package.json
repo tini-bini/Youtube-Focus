@@ -1,0 +1,23 @@
+{
+  "name": "youtube-focus-clean",
+  "version": "1.2.0",
+  "private": true,
+  "description": "Production tooling for the YouTube Focus Clean Chrome extension.",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "php:lint": "node ./scripts/php-lint.mjs",
+    "build": "node ./scripts/build-release.mjs",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run php:lint && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "@types/chrome": "^0.0.318",
+    "@types/node": "^24.5.2",
+    "eslint": "^9.24.0",
+    "globals": "^16.0.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  }
+}

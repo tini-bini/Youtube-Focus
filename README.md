@@ -1,16 +1,53 @@
 # YouTube Focus Clean
 
-Chrome Extension Manifest V3 MVP by FlegarTech.
+YouTube Focus Clean is a production-ready Chrome extension that turns YouTube into a more intentional workspace by hiding distracting surfaces, automating focus windows, and keeping optional exceptions for the pages or channels you actually want.
 
-## Folder structure
+## Product summary
+
+- Product type: Chrome extension with an optional hosted PayPal checkout helper in `checkout/`
+- Primary users: knowledge workers, students, creators, and anyone who wants a calmer YouTube experience
+- Main flows:
+  - open YouTube without the algorithmic home feed taking over
+  - switch between focus profiles or snooze protection temporarily
+  - buy or support through a validated hosted checkout URL or PayPal.Me fallback
+
+## Architecture
+
+- `shared.js`: shared domain and storage logic, input sanitizers, schedule rules, allowlist rules, analytics helpers, and PayPal.Me validation
+- `background.js`: MV3 service worker for startup normalization and global shortcuts
+- `script.js` + `popup.html` + `styles.css`: premium popup UX and user controls
+- `content.js` + `content.css`: YouTube DOM orchestration, homepage replacement, shield enforcement, and lightweight page-level feedback
+- `checkout/`: optional PHP PayPal order/capture flow for a hosted payment page
+- `scripts/`: release automation and PHP lint helpers
+- `tests/`: critical shared-logic regression tests
+
+## Core features
+
+- Hide the homepage feed and replace it with a branded focus surface
+- Hide Shorts shelves and entry links
+- Hide comments and sidebar recommendations on watch pages
+- Hide Explore navigation, notifications, and topic chips
+- Apply quick profiles: `Essentials`, `Flow`, and `Deep Work`
+- Save a focus intention that appears in both the popup and the homepage replacement
+- Snooze all shields for 15 minutes
+- Limit shields to a scheduled focus window
+- Add allowlist rules for pages or channels you want left untouched
+- Export and import settings backups
+- Track simple local analytics such as protected views, allowlist hits, and snoozes
+- Open premium and support CTAs through validated PayPal.Me links or a hosted checkout URL
+
+## Project structure
 
 ```text
-YouTube/
+YouTube-Focus-master/
+|-- assets/
+|-- background.js
 |-- content.css
 |-- content.js
+|-- docs/
+|   `-- CHROME_WEB_STORE_HANDOFF.md
+|-- icons/
 |-- checkout/
-|   |-- .env.example
-|   |-- .gitignore
 |   |-- capture-order.php
 |   |-- checkout.css
 |   |-- config.php
@@ -21,102 +58,105 @@ YouTube/
 |   `-- stop-sandbox-server.cmd
 |-- manifest.json
 |-- popup.html
-|-- README.md
 |-- script.js
-`-- styles.css
+|-- shared.js
+|-- styles.css
+|-- package.json
+|-- tsconfig.json
+|-- eslint.config.js
+|-- tests/
+`-- scripts/
 ```
 
-## What it does
+## Prerequisites
 
-- Hides the YouTube homepage feed and shows a focus message instead.
-- Expands the home replacement into a full-height focus surface that follows the user's system light or dark mode automatically.
-- Hides Shorts shelves and Shorts entry points where YouTube's DOM allows it.
-- Hides comments on watch pages.
-- Hides related videos in the right sidebar.
-- Stores settings with `chrome.storage.local`.
-- Reacts to both YouTube SPA route changes and dynamic DOM updates.
+- Node.js 24 or newer
+- npm 10 or newer
+- PHP 8.3 or newer if you want to use or validate the hosted checkout
 
-## Installation
+## Setup
 
-1. Open Chrome and go to `chrome://extensions`.
-2. Enable **Developer mode** in the top-right corner.
-3. Click **Load unpacked**.
-4. Select this project folder.
-5. Pin the extension if you want quick popup access.
+1. Install dependencies with `npm install`
+2. Open Chrome and go to `chrome://extensions`
+3. Enable Developer mode
+4. Click **Load unpacked**
+5. Select this project folder
+6. Reload the extension after any manifest change
 
-## Checkout setup
+## Scripts
 
-This project now includes a real PayPal checkout starter in `checkout/`.
+- `npm run lint`: ESLint for extension, tooling, and tests
+- `npm run typecheck`: TypeScript JS checking for shared/runtime logic
+- `npm run test`: Vitest regression tests for critical shared logic
+- `npm run php:lint`: syntax validation for the hosted checkout PHP files
+- `npm run build`: creates a Chrome Web Store upload zip in `dist/`
+- `npm run verify`: full release validation pipeline
 
-1. Copy `checkout\.env.example` to `checkout\.env`
-2. Put your PayPal credentials and checkout base URL into `checkout\.env`
+## Keyboard shortcuts
+
+- `Alt+Shift+S`: snooze or resume shields globally
+- `Alt+Shift+M`: enable `Deep Work` globally
+- Popup-only shortcuts:
+  - `/`: focus the intention field
+  - `1` to `7`: toggle the individual shields
+  - `M`: enable `Deep Work`
+  - `S`: snooze or resume shields
+
+You can review or customize global shortcuts in `chrome://extensions/shortcuts`.
+
+## Allowlist rule examples
+
+- `@yourchannel`
+- `/feed/subscriptions`
+- `/watch?v=abc123`
+- `youtube.com/@yourchannel`
+
+Rules are matched as simple page or URL fragments against the current YouTube URL.
+
+## Payment configuration
+
+The extension supports two payment paths:
+
+1. Hosted checkout: set `preferredCheckoutUrl` in `shared.js` to your deployed `checkout/` URL
+2. PayPal.Me fallback: keep `preferredCheckoutUrl` empty and configure the PayPal.Me values in `shared.js`
+
+PayPal.Me links are validated before the popup opens them. Invalid or unsafe links are disabled in the UI.
+
+### Hosted checkout setup
+
+1. Copy `checkout/.env.example` to `checkout/.env`
+2. Add your PayPal credentials and public checkout base URL
 3. For local sandbox testing, set `CHECKOUT_BASE_URL=http://127.0.0.1:8080/checkout`
-4. Update `checkout\start-sandbox-server.cmd` if your PHP executable is not at `C:\xampp\php\php.exe`
-5. Start the local PHP server with `checkout\start-sandbox-server.cmd`
-6. Open `http://127.0.0.1:8080/checkout/` to test the page directly
-7. If you want the extension to open your local checkout during development, set `preferredCheckoutUrl` in `script.js` to `http://127.0.0.1:8080/checkout/?mode=premium&amount=4.99`
-8. Open the extension popup and click `Open Checkout`
-9. After payment, return to the popup and click `Unlock on This Browser`
+4. Start a local server, for example with `php -S 127.0.0.1:8080 -t .`
+5. Open `http://127.0.0.1:8080/checkout/`
 
-Important:
+## Release flow
 
-- The checkout uses PayPal Orders v2 with server-side create and capture.
-- Secrets now belong in `checkout\.env`, not in code.
-- `checkout\.env` is ignored by git.
-- If you need to free the port, run `checkout\stop-sandbox-server.cmd`
+1. Run `npm run verify`
+2. Review `dist/release-metadata.json`
+3. Upload `dist/youtube-focus-clean-v1.2.0.zip` to the Chrome Web Store dashboard
+4. Follow [CHROME_WEB_STORE_HANDOFF.md](/c:/Users/Uporabnik/Documents/FlegarTech/Youtube-Focus-master/docs/CHROME_WEB_STORE_HANDOFF.md)
 
-## Going live later
+## Manual QA checklist
 
-When you're ready for live payments:
+1. Open `https://www.youtube.com/` and confirm the feed is replaced by the focus experience
+2. Toggle all seven shields and confirm updates land instantly without a page refresh
+3. Test `Essentials`, `Flow`, and `Deep Work`
+4. Set a focus intention and confirm it appears on the homepage replacement surface
+5. Enable a schedule and verify shields pause outside the active window
+6. Add an allowlist rule and confirm matching pages stop being modified
+7. Test snooze, export backup, and import backup
+8. Trigger the global shortcuts from `chrome://extensions/shortcuts`
+9. Verify the premium and support CTAs open the intended payment destination
+10. If you use hosted checkout, open `checkout/?mode=premium&amount=10` and verify amount validation and PayPal rendering
 
-1. Host the `checkout/` app on a real PHP server and domain
-2. Set `CHECKOUT_BASE_URL` in `checkout\.env` to your public checkout URL
-3. Set `PAYPAL_ENVIRONMENT=live` and add live PayPal credentials to `checkout\.env`
-4. Update `preferredCheckoutUrl` in `script.js` to your public checkout page URL
-5. Reload the extension
+## Selector maintenance notes
 
-Example public checkout URL:
+YouTube changes its DOM often, so these selectors are the most likely to need future maintenance:
 
-- `https://pay.yourdomain.com/checkout/`
-- `https://yourdomain.com/checkout/`
-
-## Testing checklist
-
-1. Open `https://www.youtube.com/` and confirm the home feed is replaced by the focus card.
-2. Open the extension popup and toggle each option on and off.
-3. Confirm changes apply immediately without reloading the tab.
-4. Open a regular watch page and confirm comments can be hidden and shown again.
-5. Confirm the right-side related videos can be hidden and shown again.
-6. Search for Shorts or navigate around the homepage and sidebar to verify Shorts entries are removed where possible.
-7. Move between pages inside YouTube without a full reload and verify behavior persists.
-
-## Fragile selector notes
-
-YouTube changes its DOM often, so these selectors are the most likely to need maintenance:
-
-- `ytd-browse[page-subtype="home"]` for home feed detection
-- `ytd-rich-grid-renderer` and `ytd-rich-section-renderer` for the homepage recommendation feed
+- `ytd-browse[page-subtype="home"]` for homepage detection
+- `ytd-rich-grid-renderer` and `ytd-rich-section-renderer` for homepage recommendations
 - `ytd-rich-shelf-renderer[is-shorts]`, `ytd-reel-shelf-renderer`, and `/shorts` links for Shorts detection
 - `#secondary` and `ytd-watch-next-secondary-results-renderer` for related videos
 - `ytd-comments` and `#comments` for the comment section
-
-Fallback strategy:
-
-- Root feature classes are applied at the document level so static CSS can keep hiding stable surfaces.
-- A `MutationObserver` re-runs the logic when YouTube injects new content.
-- YouTube navigation events and a lightweight URL watcher re-apply behavior during SPA page changes.
-- Shorts hiding also uses link-based DOM traversal so it can hide nearby containers even when shelf markup shifts.
-
-## Known MVP limitations
-
-- Some Shorts links may reappear briefly before YouTube finishes rendering and the observer runs again.
-- YouTube experiments can rename or restructure components, which may require selector updates.
-- The extension targets the main YouTube web app and has not been tuned for every regional or experimental layout.
-
-## V2 roadmap
-
-- Add an allowlist for channels, pages, or specific YouTube sections.
-- Add a timed focus mode with scheduled on and off hours.
-- Add optional hiding for notifications, explore, and trending surfaces.
-- Add backup and sync import/export for settings.
-- Add visual profile presets such as Deep Work or Minimal Watch.
+- top-bar notification and guide navigation selectors for extra shields

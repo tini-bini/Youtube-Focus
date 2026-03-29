@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "RealDeal — Fake Sale Detector",
+  "name": "RealDeal - Fake Sale Detector",
   "short_name": "RealDeal",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Detect fake sales and retailer pricing tricks. See real price history and get a Deal Trust Score on every product page.",
-  "permissions": ["storage", "activeTab", "scripting", "alarms"],
+  "permissions": ["storage", "activeTab", "scripting", "alarms", "notifications"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
@@ -13,6 +13,7 @@
     {
       "matches": ["<all_urls>"],
       "js": [
+        "shared/config.js",
         "content/utils.js",
         "content/storage.js",
         "content/scrapers/base.js",
@@ -42,7 +43,7 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     },
-    "default_title": "RealDeal — Fake Sale Detector"
+    "default_title": "RealDeal - Fake Sale Detector"
   },
   "options_page": "settings/settings.html",
   "icons": {

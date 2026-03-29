@@ -1,147 +1,171 @@
-# RealDeal — Fake Sale Detector
+# RealDeal - Fake Sale Detector
 
-A Chrome extension (Manifest V3) that helps shoppers determine whether a "sale" price is genuinely a discount or a retailer trick.
+RealDeal is a production-ready Chrome extension that helps shoppers detect fake discounts, inflated anchor prices, artificial urgency, and misleading sale claims directly on product pages.
 
-## Features
+## Product Summary
 
-- **Price History Tracking** — automatically logs prices on every visit, stored 100% locally
-- **Trust Score (0–100)** — color-coded badge: Green = Legit, Yellow = Questionable, Red = Likely Fake
-- **Trick Detection:**
-  - Fake "Was" Price — item has been "on sale" for 80%+ of tracked history
-  - Inflated Original Price — the "original" price was never actually charged
-  - Artificial Urgency — countdown timers, "Only X left!", "Sale ends in…"
-  - Pre-Sale Price Spike — price was raised 1–3 weeks before the "sale"
-  - Subscription Price Disguise — monthly charge styled as a one-time price
-- **Price History Chart** — native canvas chart (no dependencies), 30/60/90 day views
-- **Inline Label** — "📉 Lowest tracked: $X" injected near the price on the page
-- **Export CSV** — download your full price history
-- **Settings** — configure retention period, toggle detections, clear data
+- Product type: Chrome extension (Manifest V3)
+- Primary users: online shoppers comparing deals across major retailers
+- Main flows:
+  1. Open a supported product page and see the trust score badge, inline history hints, and the full analysis side panel.
+  2. Save a target price and receive a browser notification when the current price reaches it.
+  3. Review recent products, manage retention settings, export history, and import/export JSON backups.
 
-## Supported Sites
+## Core Features
 
-| Site | Scraper |
-|------|---------|
-| Amazon (.com, .co.uk, .de, .fr, .es, .it, .ca, .com.au, .nl, .pl, .se) | Dedicated |
-| Walmart | Dedicated |
-| eBay (.com, .co.uk, .de, .fr, .es, .it) | Dedicated |
-| AliExpress | Dedicated |
-| Zalando (all EU TLDs + Zalando Lounge) | Dedicated |
-| About You (all EU TLDs + about-you.de) | Dedicated |
-| Zara | Dedicated |
-| H&M | Dedicated |
-| Etsy, Target, Best Buy, OTTO, ASOS | Generic fallback |
-| Any other e-commerce site | Generic (JSON-LD + CSS heuristics) |
+- Dedicated scrapers for Amazon, Walmart, eBay, AliExpress, Zalando, About You, Zara, and H&M
+- Generic fallback scraping using JSON-LD, meta tags, microdata, and DOM heuristics
+- Trust score with fake-sale analysis and verdicts
+- Floating badge plus on-page side panel with price history chart
+- Local-only storage using `chrome.storage.local`
+- Target price tracking with notification support
+- Recent products rail in the popup
+- JSON backup and restore plus CSV export
+- PayPal.me support flow validation and disabled states when links are not configured
 
-## Installation
+## Architecture
 
-### Step 1 — Generate Icons
+- `shared/`
+  Cross-surface configuration, storage keys, formatting helpers, theme helpers, and PayPal.me utilities.
+- `content/`
+  Product scraping, analysis logic, local storage persistence, and Shadow DOM in-page UI.
+- `popup/`
+  Fast decision surface with page analysis, quick toggles, targets, recent products, and support actions.
+- `settings/`
+  Retention controls, exports/imports, privacy messaging, and support-link diagnostics.
+- `scripts/`
+  Repo-native lint, contract checks, JavaScript syntax compilation, packaging, and release validation.
+- `tests/`
+  Python-driven unit tests that execute real JavaScript logic through QuickJS.
 
-1. Open `icons/generate-icons.html` in Chrome
-2. Click "Download" for each icon (16, 48, 128)
-3. Save them as `icons/icon16.png`, `icons/icon48.png`, `icons/icon128.png`
+## Repository Layout
 
-### Step 2 — Load the Extension
-
-1. Open Chrome and go to `chrome://extensions/`
-2. Enable **Developer mode** (top-right toggle)
-3. Click **Load unpacked**
-4. Select the `RealDeal/` folder
-
-The RealDeal icon will appear in your Chrome toolbar.
-
-### Step 3 — Start Shopping
-
-Navigate to any supported product page. RealDeal will automatically:
-- Scrape the current price
-- Store it in your local price history
-- Display the Trust Score badge (bottom-right corner)
-- Inject a "Lowest tracked" label near the price
-
-Click the badge to open the full analysis panel with the price history chart.
-
-## Project Structure
-
-```
-RealDeal/
-├── manifest.json             — MV3 extension manifest
-├── background.js             — Service worker (badge updates, storage pruning)
-├── content/
-│   ├── utils.js              — Shared utilities (parsing, formatting, DOM helpers)
-│   ├── storage.js            — chrome.storage.local wrapper
-│   ├── main.js               — Orchestrator (ties everything together)
-│   ├── scrapers/
-│   │   ├── base.js           — Base scraper class
-│   │   ├── amazon.js
-│   │   ├── walmart.js
-│   │   ├── ebay.js
-│   │   ├── aliexpress.js
-│   │   ├── zalando.js
-│   │   ├── aboutyou.js
-│   │   ├── zara.js
-│   │   ├── hm.js
-│   │   ├── generic.js        — JSON-LD + CSS fallback scraper
-│   │   └── index.js          — Scraper registry
-│   ├── analyzers/
-│   │   ├── trick-detector.js — Detects all 5 pricing tricks
-│   │   └── trust-score.js    — Calculates 0–100 trust score
-│   └── ui/
-│       ├── badge.js          — Floating badge (Shadow DOM)
-│       └── sidepanel.js      — Detail panel with canvas chart (Shadow DOM)
-├── popup/
-│   ├── popup.html / .js / .css — Extension toolbar popup
-├── settings/
-│   ├── settings.html / .js / .css — Settings & history management page
-└── icons/
-    ├── generate-icons.html   — Open in browser to generate PNG icons
-    ├── icon16.png            — (generate using generate-icons.html)
-    ├── icon48.png
-    └── icon128.png
+```text
+background.js
+manifest.json
+shared/
+content/
+popup/
+settings/
+scripts/
+tests/
+release/
+dist/
 ```
 
-## Adding a New Scraper
+## Local Setup
 
-1. Create `content/scrapers/mysite.js` extending `RealDeal.ScraperBase`:
+1. Install Python 3.12 or newer.
+2. Install dev dependencies:
 
-```javascript
-/* global RealDeal */
-RealDeal.ScraperMySite = (function () {
-  class MySiteScraper extends RealDeal.ScraperBase {
-    constructor() { super('mysite'); }
-
-    canHandle() {
-      return /mysite\.com/i.test(location.hostname);
-    }
-
-    scrape() {
-      const name          = this._text(['h1.product-title']);
-      const currentPrice  = this._price(['.price-current']);
-      const originalPrice = this._price(['del.price-was']);
-      if (!name || currentPrice == null) return null;
-
-      return this._build({
-        name, currentPrice, originalPrice,
-        currency: this._currency(this._text(['.price-current']) || '')
-      });
-    }
-  }
-  return new MySiteScraper();
-})();
+```powershell
+python -m pip install -r requirements-dev.txt
 ```
 
-2. Add the file to the `js` array in `manifest.json` (before `index.js`)
-3. Register it in `content/scrapers/index.js` (before `ScraperGeneric`)
-4. Add the hostname patterns to `host_permissions` and `content_scripts.matches` in `manifest.json`
+3. Load the unpacked extension in Chrome:
 
-## Privacy
+```text
+chrome://extensions -> Developer mode -> Load unpacked -> select this repository root
+```
 
-- **Zero telemetry** — no analytics, no crash reports, no external requests
-- **Local only** — all price data lives in `chrome.storage.local` on your device
-- **You control the data** — clear history anytime from Settings
+## Development and QA Commands
 
-## Tech Stack
+Lint:
 
-- Manifest V3 Chrome Extension
-- Vanilla JavaScript (no framework, no bundler required)
-- Native Canvas API for charts (no Chart.js dependency)
-- Shadow DOM for UI isolation
-- `chrome.storage.local` for persistence
+```powershell
+python scripts/lint_repo.py
+```
+
+Contract/type checks:
+
+```powershell
+python scripts/typecheck_repo.py
+```
+
+JavaScript syntax compilation:
+
+```powershell
+python scripts/check_js_syntax.py
+```
+
+Unit tests:
+
+```powershell
+python -m unittest discover -s tests -p "test_*.py" -v
+```
+
+Full release validation:
+
+```powershell
+python scripts/release_validate.py
+```
+
+Package the upload artifact:
+
+```powershell
+python scripts/package_release.py
+```
+
+## Build and Release Output
+
+The release package is created at:
+
+```text
+dist/realdeal-chrome-extension-v<version>.zip
+```
+
+The package includes only the files required for Chrome Web Store upload.
+
+## PayPal.me Configuration
+
+PayPal support links are configured in:
+
+```text
+shared/config.js
+```
+
+Current behavior:
+
+- Empty or invalid PayPal.me links are rejected by validation.
+- Disabled states are shown in the popup and settings when links are missing.
+- Amount-prefilled links are generated in canonical `https://paypal.me/<handle>/<amount>` form.
+
+Before a live release, replace the empty `baseUrl` values in `shared/config.js` with real PayPal.me links and rerun:
+
+```powershell
+python scripts/release_validate.py
+```
+
+## Environment Variables
+
+This project does not require environment variables for local runtime or packaging.
+
+## Security and Privacy Notes
+
+- No external servers are contacted for price analysis.
+- All product history remains in `chrome.storage.local`.
+- No credentials, API keys, or secrets are stored in the repository.
+- PayPal support links are validated before UI navigation is enabled.
+
+## Release Handoff
+
+Use the materials in `release/` for manual dashboard upload:
+
+- `release/CHROME_WEB_STORE_HANDOFF.md`
+- `release/STORE_LISTING_TEMPLATE.md`
+
+## Manual Verification Before Upload
+
+1. Load the unpacked extension in Chrome.
+2. Visit at least one supported product page and one unsupported page.
+3. Verify:
+   - popup loading, no-product, unavailable, and product states
+   - side panel opens from the badge and with `Alt+Shift+D`
+   - target price save and clear flows
+   - recent products populate
+   - settings save, reset, export, import, and clear flows
+4. If PayPal links are configured, confirm each PayPal CTA opens the expected PayPal.me URL on desktop and mobile-sized layouts.
+
+## Version
+
+- Extension version: `1.2.0`

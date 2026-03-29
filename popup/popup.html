@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RealDeal</title>
+  <script src="../shared/config.js"></script>
+  <script src="../shared/paypal.js"></script>
+  <script>
+    document.documentElement.dataset.theme = RealDealShared.resolveTheme();
+  </script>
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
 </head>
@@ -28,12 +33,18 @@
           </svg>
         </div>
         <div>
-          <p class="eyebrow">Deal intelligence</p>
+          <p class="eyebrow">Retail pricing clarity</p>
           <h1>RealDeal</h1>
         </div>
       </div>
 
       <div class="topbar-actions">
+        <button id="refresh-btn" class="icon-button" type="button" aria-label="Refresh analysis">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M20 11a8 8 0 1 0 2.1 5.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M20 4v7h-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
         <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle theme"></button>
         <button id="settings-btn" class="icon-button" type="button" aria-label="Open settings">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -49,7 +60,17 @@
         <div class="loader-orb" aria-hidden="true"></div>
         <div class="state-copy">
           <h2>Scanning this page</h2>
-          <p>Pulling live pricing signals, history, and fake-sale checks.</p>
+          <p>Checking the live price, tracked history, and possible fake-sale signals.</p>
+        </div>
+      </section>
+
+      <section id="state-unavailable" class="glass-panel state-panel hidden">
+        <div class="empty-art" aria-hidden="true">
+          <span></span>
+        </div>
+        <div class="state-copy">
+          <h2>This tab cannot be analyzed</h2>
+          <p>Protected browser pages and the Chrome Web Store do not allow extension analysis. Open a retailer product page to continue.</p>
         </div>
       </section>
 
@@ -59,14 +80,9 @@
         </div>
         <div class="state-copy">
           <h2>No product page detected</h2>
-          <p>Open a supported store product page to unlock the trust score, pricing history, and quick actions.</p>
+          <p>Open a supported product page to unlock the trust score, pricing history, quick actions, and side panel.</p>
         </div>
-        <div class="state-tags">
-          <span class="soft-pill">Amazon</span>
-          <span class="soft-pill">Zalando</span>
-          <span class="soft-pill">eBay</span>
-          <span class="soft-pill">Walmart</span>
-        </div>
+        <div class="state-tags" id="supported-stores"></div>
       </section>
 
       <section id="state-product" class="product-stack hidden">
@@ -86,6 +102,11 @@
               <p class="eyebrow">Deal trust score</p>
               <h2 id="score-cat">Loading</h2>
               <p id="score-verdict" class="hero-verdict"></p>
+              <div class="support-row">
+                <span id="analysis-updated" class="soft-pill">Fresh scan</span>
+                <span id="shortcut-pill" class="soft-pill">Alt+Shift+D</span>
+                <span id="confidence-pill" class="soft-pill">Dedicated parser</span>
+              </div>
             </div>
           </div>
 
@@ -112,6 +133,24 @@
               <span class="metric-label">Price stability</span>
               <strong id="stability-value" class="metric-value">--</strong>
               <span id="stability-note" class="metric-note">Waiting for history</span>
+            </article>
+          </div>
+
+          <div class="mini-grid">
+            <article class="mini-tile">
+              <span class="metric-label">Tracking</span>
+              <strong id="snapshot-value" class="mini-value">0 snapshots</strong>
+              <span class="metric-note">Stored only on this device</span>
+            </article>
+            <article class="mini-tile">
+              <span class="metric-label">Target status</span>
+              <strong id="target-summary" class="mini-value">No target saved</strong>
+              <span class="metric-note">Save a buy price below</span>
+            </article>
+            <article class="mini-tile">
+              <span class="metric-label">Workflow</span>
+              <strong class="mini-value">Open instant analysis</strong>
+              <span class="metric-note">Use the button below or Alt+Shift+D</span>
             </article>
           </div>
         </section>
@@ -153,7 +192,7 @@
           <label class="toggle-row" for="toggle-badge">
             <div class="toggle-copy">
               <span class="toggle-title">Floating badge</span>
-              <span class="toggle-text">Keep the on-page trust score visible while you browse.</span>
+              <span class="toggle-text">Keep the trust score visible while you browse.</span>
             </div>
             <span class="switch">
               <input id="toggle-badge" type="checkbox">
@@ -164,7 +203,7 @@
           <label class="toggle-row" for="toggle-inline-label">
             <div class="toggle-copy">
               <span class="toggle-title">Inline lowest price</span>
-              <span class="toggle-text">Inject the lowest tracked price directly beside the listing price.</span>
+              <span class="toggle-text">Inject the lowest tracked price beside the listing price.</span>
             </div>
             <span class="switch">
               <input id="toggle-inline-label" type="checkbox">
@@ -175,7 +214,7 @@
           <label class="toggle-row" for="toggle-urgency">
             <div class="toggle-copy">
               <span class="toggle-title">Urgency detection</span>
-              <span class="toggle-text">Flag countdown timers and pressure cues in the live page.</span>
+              <span class="toggle-text">Flag countdown timers and pressure cues on the live page.</span>
             </div>
             <span class="switch">
               <input id="toggle-urgency" type="checkbox">
@@ -218,6 +257,29 @@
         <footer class="popup-footer">
           <span id="footer-note">All pricing history stays local on this device.</span>
         </footer>
+      </section>
+
+      <section class="glass-panel recent-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Recent products</p>
+            <h3>Jump back in</h3>
+          </div>
+          <span id="recent-count" class="soft-pill">0 recent</span>
+        </div>
+        <div id="recent-list" class="recent-list"></div>
+      </section>
+
+      <section class="glass-panel support-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Support</p>
+            <h3>Back development</h3>
+          </div>
+          <span id="support-status" class="soft-pill">Unavailable</span>
+        </div>
+        <p id="support-note" class="supporting-text">Support links are not configured in this build.</p>
+        <div id="support-actions" class="action-row"></div>
       </section>
     </main>
 

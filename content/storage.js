@@ -1,11 +1,8 @@
-// RealDeal — Storage Layer
-// All data stays local via chrome.storage.local. No external requests.
-
-/* global RealDeal */
+/* global RealDeal, RealDealShared */
 RealDeal.Storage = (function () {
-  'use strict';
+  "use strict";
 
-  const DEFAULT_SETTINGS = {
+  const DEFAULT_SETTINGS = RealDealShared?.DEFAULT_SETTINGS || {
     historyDays: 90,
     enableFakeWasDetection: true,
     enablePriceAnchorDetection: true,
@@ -16,68 +13,67 @@ RealDeal.Storage = (function () {
     showBadge: true
   };
 
-  // ── Settings ──────────────────────────────────────────────────────────────
+  const STORAGE_KEYS = RealDealShared?.STORAGE_KEYS || {
+    settings: "rd_settings",
+    productPrefix: "rd_p_"
+  };
 
   async function getSettings() {
-    const data = await chrome.storage.local.get('rd_settings');
-    return Object.assign({}, DEFAULT_SETTINGS, data.rd_settings || {});
+    const snapshot = await chrome.storage.local.get(STORAGE_KEYS.settings);
+    return {
+      ...DEFAULT_SETTINGS,
+      ...(snapshot[STORAGE_KEYS.settings] || {})
+    };
   }
 
   async function saveSettings(settings) {
-    const merged = Object.assign({}, DEFAULT_SETTINGS, settings);
-    await chrome.storage.local.set({ rd_settings: merged });
+    const merged = {
+      ...DEFAULT_SETTINGS,
+      ...(settings || {})
+    };
+    await chrome.storage.local.set({ [STORAGE_KEYS.settings]: merged });
     return merged;
   }
 
-  // ── Product data ──────────────────────────────────────────────────────────
-
   async function getProduct(productId) {
-    const data = await chrome.storage.local.get(productId);
-    return data[productId] || null;
+    const snapshot = await chrome.storage.local.get(productId);
+    return snapshot[productId] || null;
   }
 
-  /**
-   * Record a new price observation for a product.
-   * Creates the product record if it doesn't exist yet.
-   *
-   * @param {object} scraped  — output from a scraper
-   * @param {object} settings — current user settings
-   * @returns {object}        — updated stored product
-   */
   async function recordPrice(scraped, settings) {
-    if (!scraped || scraped.currentPrice == null) return null;
+    if (!scraped || scraped.currentPrice == null) {
+      return null;
+    }
 
     const productId = RealDeal.Utils.getProductId(scraped.productUrl || location.href, scraped.name);
-    const stored    = (await getProduct(productId)) || createProductRecord(productId, scraped);
-
+    const stored = (await getProduct(productId)) || createProductRecord(productId, scraped);
     const entry = {
-      timestamp:     Date.now(),
-      price:         scraped.currentPrice,
+      timestamp: Date.now(),
+      price: scraped.currentPrice,
       originalPrice: scraped.originalPrice || null,
-      salePercent:   scraped.salePercent   || null,
-      isSale:        scraped.isOnSale      || false
+      salePercent: scraped.salePercent || null,
+      isSale: scraped.isOnSale || false
     };
 
-    // Avoid duplicate entries within 1 hour (e.g. SPA re-render)
-    const recentMs = 60 * 60 * 1000;
-    const latest   = stored.history[stored.history.length - 1];
-    if (latest && (entry.timestamp - latest.timestamp) < recentMs && latest.price === entry.price) {
-      return stored; // no-op, nothing changed
+    const latest = stored.history[stored.history.length - 1];
+    if (latest && entry.timestamp - latest.timestamp < 60 * 60 * 1000 && latest.price === entry.price) {
+      stored.lastUpdated = latest.timestamp;
+      return stored;
     }
 
     stored.history.push(entry);
+    pruneHistory(stored, settings?.historyDays || DEFAULT_SETTINGS.historyDays);
 
-    // Prune old entries
-    const cutoff = Date.now() - (settings.historyDays || 90) * 86400000;
-    stored.history = stored.history.filter(h => h.timestamp >= cutoff);
-
-    // Update aggregate stats
-    const prices    = stored.history.map(h => h.price).filter(p => p != null);
-    stored.lowestPrice  = prices.length ? Math.min(...prices) : entry.price;
+    const prices = stored.history.map((item) => item.price).filter((price) => price != null);
+    stored.lowestPrice = prices.length ? Math.min(...prices) : entry.price;
     stored.highestPrice = prices.length ? Math.max(...prices) : entry.price;
-    stored.lastUpdated  = Date.now();
-    stored.name         = scraped.name || stored.name;
-    stored.currency     = scraped.currency || stored.currency;
+    stored.lastUpdated = Date.now();
+    stored.name = scraped.name || stored.name;
+    stored.currency = scraped.currency || stored.currency;
+    stored.site = scraped.site || stored.site;
+    stored.productUrl = scraped.productUrl || stored.productUrl;
+    stored.scraperConfidence = scraped.scraperConfidence || stored.scraperConfidence || "high";
+    stored.scraperSource = scraped.scraperSource || stored.scraperSource || stored.site;
 
     await chrome.storage.local.set({ [productId]: stored });
     return stored;
@@ -86,42 +82,51 @@ RealDeal.Storage = (function () {
   function createProductRecord(productId, scraped) {
     return {
       productId,
-      name:         scraped.name || 'Unknown product',
-      site:         scraped.site || 'generic',
-      currency:     scraped.currency || 'USD',
-      productUrl:   scraped.productUrl || location.href,
-      history:      [],
-      lowestPrice:  null,
+      name: scraped.name || "Unknown product",
+      site: scraped.site || "generic",
+      currency: scraped.currency || "USD",
+      productUrl: scraped.productUrl || location.href,
+      history: [],
+      lowestPrice: null,
       highestPrice: null,
-      lastUpdated:  null
+      lastUpdated: null,
+      scraperConfidence: scraped.scraperConfidence || "high",
+      scraperSource: scraped.scraperSource || scraped.site || "unknown"
     };
   }
 
-  /** Return all stored product records */
+  function pruneHistory(record, historyDays) {
+    const cutoff = Date.now() - historyDays * 86400000;
+    record.history = record.history.filter((entry) => entry.timestamp >= cutoff);
+  }
+
   async function getAllProducts() {
-    const data = await chrome.storage.local.get(null);
-    return Object.entries(data)
-      .filter(([k]) => k.startsWith('rd_p_'))
-      .map(([, v]) => v);
+    const snapshot = await chrome.storage.local.get(null);
+    return Object.entries(snapshot)
+      .filter(([key]) => key.startsWith(STORAGE_KEYS.productPrefix))
+      .map(([, value]) => value);
   }
 
-  /** Delete all price history and settings */
   async function clearAll() {
-    const data = await chrome.storage.local.get(null);
-    const keys = Object.keys(data).filter(k => k.startsWith('rd_p_') || k === 'rd_settings');
-    if (keys.length) await chrome.storage.local.remove(keys);
+    const snapshot = await chrome.storage.local.get(null);
+    const keys = Object.keys(snapshot).filter((key) => {
+      return key.startsWith(STORAGE_KEYS.productPrefix) || key === STORAGE_KEYS.settings;
+    });
+    if (keys.length) {
+      await chrome.storage.local.remove(keys);
+    }
   }
 
-  /** Delete price history for a single product */
   async function clearProduct(productId) {
     await chrome.storage.local.remove(productId);
   }
 
-  /** Return total number of stored price observations */
   async function getStats() {
     const products = await getAllProducts();
-    const totalObs = products.reduce((acc, p) => acc + (p.history?.length || 0), 0);
-    return { productCount: products.length, observationCount: totalObs };
+    return {
+      productCount: products.length,
+      observationCount: products.reduce((total, product) => total + (product.history?.length || 0), 0)
+    };
   }
 
   return {

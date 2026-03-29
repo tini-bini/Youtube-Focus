@@ -1,4 +1,4 @@
-// RealDeal â€” Generic Fallback Scraper
+// RealDeal - Generic fallback scraper
 // Tries structured data, meta tags, and broad DOM heuristics for modern storefronts.
 
 /* global RealDeal */
@@ -58,7 +58,9 @@ RealDeal.ScraperGeneric = (function () {
               name: product.name || product.title || product.headline || this._text(NAME_SELECTORS),
               currentPrice: current,
               originalPrice: original,
-              currency
+              currency,
+              scraperConfidence: 'medium',
+              scraperSource: 'JSON-LD fallback'
             });
           }
         } catch { /* ignore invalid JSON-LD */ }
@@ -92,7 +94,9 @@ RealDeal.ScraperGeneric = (function () {
         name,
         currentPrice: current,
         originalPrice: original,
-        currency
+        currency,
+        scraperConfidence: 'medium',
+        scraperSource: 'Meta tags fallback'
       });
     }
 
@@ -113,7 +117,9 @@ RealDeal.ScraperGeneric = (function () {
         name: nameEl?.getAttribute('content') || nameEl?.textContent || this._text(NAME_SELECTORS),
         currentPrice: current,
         originalPrice: original,
-        currency
+        currency,
+        scraperConfidence: 'medium',
+        scraperSource: 'Microdata fallback'
       });
     }
 
@@ -149,7 +155,9 @@ RealDeal.ScraperGeneric = (function () {
         originalPrice: original,
         salePercent,
         currency,
-        isSubscriptionPrice
+        isSubscriptionPrice,
+        scraperConfidence: 'low',
+        scraperSource: 'DOM fallback'
       });
     }
 

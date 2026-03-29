@@ -65,7 +65,16 @@ RealDeal.ScraperBase = (function () {
     }
 
     /** Build a valid ScrapedProduct, filling safe defaults */
-    _build({ name, currentPrice, originalPrice, salePercent, currency, isSubscriptionPrice }) {
+    _build({
+      name,
+      currentPrice,
+      originalPrice,
+      salePercent,
+      currency,
+      isSubscriptionPrice,
+      scraperConfidence,
+      scraperSource
+    }) {
       const isOnSale = (originalPrice != null && originalPrice > (currentPrice || 0))
         || (salePercent != null && salePercent > 0);
 
@@ -78,7 +87,9 @@ RealDeal.ScraperBase = (function () {
         isOnSale:            !!isOnSale,
         isSubscriptionPrice: !!isSubscriptionPrice,
         productUrl:          this._url(),
-        site:                this.name
+        site:                this.name,
+        scraperConfidence:   scraperConfidence || 'high',
+        scraperSource:       scraperSource || this.name
       };
     }
   }

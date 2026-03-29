@@ -1,197 +1,217 @@
-// RealDeal — Utilities
-// Shared helpers used by all content script modules.
-
-/* global RealDeal */
-if (typeof RealDeal === 'undefined') var RealDeal = {};
+/* global RealDealShared */
+if (typeof RealDeal === "undefined") {
+  var RealDeal = {};
+}
 
 RealDeal.Utils = (function () {
-  'use strict';
+  "use strict";
 
-  // ── Hashing ───────────────────────────────────────────────────────────────
+  const shared = typeof RealDealShared === "object" ? RealDealShared : null;
 
-  /** FNV-1a 32-bit hash → hex string */
-  function hashString(str) {
+  const CURRENCY_SYMBOLS = {
+    USD: "$",
+    EUR: "\u20AC",
+    GBP: "\u00A3",
+    CAD: "C$",
+    AUD: "A$",
+    INR: "\u20B9",
+    JPY: "\u00A5",
+    RUB: "\u20BD",
+    PLN: "PLN ",
+    CHF: "CHF "
+  };
+
+  function hashString(value) {
+    if (shared?.hashString) {
+      return shared.hashString(value);
+    }
+
     let hash = 2166136261 >>> 0;
-    for (let i = 0; i < str.length; i++) {
-      hash ^= str.charCodeAt(i);
+    for (let index = 0; index < value.length; index += 1) {
+      hash ^= value.charCodeAt(index);
       hash = Math.imul(hash, 16777619) >>> 0;
     }
-    return hash.toString(16).padStart(8, '0');
+    return hash.toString(16).padStart(8, "0");
   }
-
-  function getProductId(url, name) {
-    const normalized = normalizeUrl(url) + '|' + (name || '').toLowerCase().trim().slice(0, 120);
-    return 'rd_p_' + hashString(normalized);
-  }
-
-  // ── URL helpers ───────────────────────────────────────────────────────────
 
   function normalizeUrl(url) {
+    if (shared?.normalizeUrl) {
+      return shared.normalizeUrl(url || location.href);
+    }
+
     try {
-      const u = new URL(url || location.href);
-      // Strip query params that are tracking, keep only product-identifying ones
-      const keepParams = ['id', 'productid', 'asin', 'item', 'sku', 'gtin', 'article'];
-      const kept = new URLSearchParams();
-      for (const [k, v] of u.searchParams) {
-        if (keepParams.includes(k.toLowerCase())) kept.set(k, v);
-      }
-      const qs = kept.toString();
-      return u.hostname.replace(/^www\./, '') + u.pathname + (qs ? '?' + qs : '');
+      const parsed = new URL(url || location.href);
+      const keepParams = ["id", "productid", "asin", "item", "sku", "gtin", "article"];
+      const params = new URLSearchParams();
+      parsed.searchParams.forEach((value, key) => {
+        if (keepParams.includes(key.toLowerCase())) {
+          params.set(key, value);
+        }
+      });
+      const query = params.toString();
+      return `${parsed.hostname.replace(/^www\./, "")}${parsed.pathname}${query ? `?${query}` : ""}`;
     } catch {
       return url || location.href;
     }
   }
 
-  function getSiteName(hostname) {
-    hostname = (hostname || location.hostname).replace(/^www\./, '');
-    if (/amazon\./i.test(hostname))     return 'amazon';
-    if (/walmart\./i.test(hostname))    return 'walmart';
-    if (/ebay\./i.test(hostname))       return 'ebay';
-    if (/aliexpress\./i.test(hostname)) return 'aliexpress';
-    if (/zalando/i.test(hostname))      return 'zalando';
-    if (/aboutyou|about-you/i.test(hostname)) return 'aboutyou';
-    if (/zara\./i.test(hostname))       return 'zara';
-    if (/hm\.com/i.test(hostname))      return 'hm';
-    if (/otto\./i.test(hostname))       return 'otto';
-    if (/asos\./i.test(hostname))       return 'asos';
-    if (/etsy\./i.test(hostname))       return 'etsy';
-    if (/target\./i.test(hostname))     return 'target';
-    if (/bestbuy\./i.test(hostname))    return 'bestbuy';
-    return 'generic';
+  function getProductId(url, name) {
+    const normalized = `${normalizeUrl(url)}|${String(name || "").toLowerCase().trim().slice(0, 120)}`;
+    return `rd_p_${hashString(normalized)}`;
   }
 
-  // ── Price parsing ─────────────────────────────────────────────────────────
+  function getSiteName(hostname) {
+    const normalizedHost = (hostname || location.hostname).replace(/^www\./, "");
+    if (/amazon\./i.test(normalizedHost)) return "amazon";
+    if (/walmart\./i.test(normalizedHost)) return "walmart";
+    if (/ebay\./i.test(normalizedHost)) return "ebay";
+    if (/aliexpress\./i.test(normalizedHost)) return "aliexpress";
+    if (/zalando/i.test(normalizedHost)) return "zalando";
+    if (/aboutyou|about-you/i.test(normalizedHost)) return "aboutyou";
+    if (/zara\./i.test(normalizedHost)) return "zara";
+    if (/hm\.com/i.test(normalizedHost)) return "hm";
+    if (/otto\./i.test(normalizedHost)) return "otto";
+    if (/asos\./i.test(normalizedHost)) return "asos";
+    if (/etsy\./i.test(normalizedHost)) return "etsy";
+    if (/target\./i.test(normalizedHost)) return "target";
+    if (/bestbuy\./i.test(normalizedHost)) return "bestbuy";
+    return "generic";
+  }
 
-  /**
-   * Parse a localised price string (handles €, $, £, comma/dot formats).
-   * Returns a number or null.
-   */
   function parsePrice(raw) {
-    if (raw == null) return null;
-    let s = String(raw).trim();
-
-    // Strip currency symbols, non-breaking spaces, etc.
-    s = s.replace(/[€$£¥₹₽\u00a0\u200b]/g, '').trim();
-
-    // Remove "per month", "/mo", etc. — flag handled separately
-    s = s.replace(/\s*\/\s*(mo|month|year|yr|week|wk).*/i, '');
-
-    // European format: 1.234,56 → 1234.56
-    if (/^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(s)) {
-      s = s.replace(/\./g, '').replace(',', '.');
-    }
-    // American format: 1,234.56 → 1234.56
-    else if (/^\d{1,3}(,\d{3})+(\.\d{1,2})?$/.test(s)) {
-      s = s.replace(/,/g, '');
-    }
-    // Simple comma decimal: 1234,56
-    else if (/^\d+,\d{1,2}$/.test(s)) {
-      s = s.replace(',', '.');
-    }
-    // Strip remaining commas used as thousands
-    else {
-      s = s.replace(/,/g, '');
+    if (raw == null) {
+      return null;
     }
 
-    const n = parseFloat(s);
-    return isNaN(n) || n <= 0 ? null : n;
+    let value = String(raw).trim();
+    value = value.replace(/[\u20AC$\u00A3\u00A5\u20B9\u20BD\u00A0\u200B]/g, "").trim();
+    value = value.replace(/\s*\/\s*(mo|month|year|yr|week|wk).*/i, "");
+
+    if (/^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(value)) {
+      value = value.replace(/\./g, "").replace(",", ".");
+    } else if (/^\d{1,3}(,\d{3})+(\.\d{1,2})?$/.test(value)) {
+      value = value.replace(/,/g, "");
+    } else if (/^\d+,\d{1,2}$/.test(value)) {
+      value = value.replace(",", ".");
+    } else {
+      value = value.replace(/,/g, "");
+    }
+
+    const numeric = Number.parseFloat(value);
+    return Number.isFinite(numeric) && numeric > 0 ? numeric : null;
   }
 
   function detectCurrency(text) {
-    if (!text) return 'USD';
-    const t = String(text);
-    if (t.includes('€'))  return 'EUR';
-    if (t.includes('£'))  return 'GBP';
-    if (/C\$|CA\$/i.test(t)) return 'CAD';
-    if (/A\$|AU\$/i.test(t)) return 'AUD';
-    if (t.includes('₹'))  return 'INR';
-    if (t.includes('¥'))  return 'JPY';
-    if (t.includes('₽'))  return 'RUB';
-    if (t.includes('zł') || /PLN/i.test(t)) return 'PLN';
-    if (t.includes('kr') || /SEK|DKK|NOK/i.test(t)) return 'SEK';
-    if (t.includes('Fr') || /CHF/i.test(t)) return 'CHF';
-    if (t.includes('$'))  return 'USD';
-    return 'USD';
+    const raw = String(text || "");
+    if (raw.includes("\u20AC")) return "EUR";
+    if (raw.includes("\u00A3")) return "GBP";
+    if (/C\$|CA\$/i.test(raw)) return "CAD";
+    if (/A\$|AU\$/i.test(raw)) return "AUD";
+    if (raw.includes("\u20B9")) return "INR";
+    if (raw.includes("\u00A5")) return "JPY";
+    if (raw.includes("\u20BD")) return "RUB";
+    if (/PLN/i.test(raw)) return "PLN";
+    if (raw.includes("Fr") || /CHF/i.test(raw)) return "CHF";
+    if (raw.includes("$")) return "USD";
+    return "USD";
   }
-
-  // ── Formatting ────────────────────────────────────────────────────────────
-
-  const CURRENCY_SYMBOLS = {
-    USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$',
-    INR: '₹', JPY: '¥', RUB: '₽', PLN: 'zł', CHF: 'Fr'
-  };
 
   function formatPrice(amount, currency) {
-    if (amount == null || isNaN(amount)) return 'N/A';
-    const sym = CURRENCY_SYMBOLS[currency] || (currency || '') + ' ';
-    return sym + amount.toFixed(2);
+    if (amount == null || Number.isNaN(Number(amount))) {
+      return "N/A";
+    }
+
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: currency || "USD",
+        maximumFractionDigits: 2
+      }).format(amount);
+    } catch {
+      return `${CURRENCY_SYMBOLS[currency] || `${currency || ""} `}${Number(amount).toFixed(2)}`;
+    }
   }
 
-  function formatDate(ts) {
-    return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' });
+  function formatDate(timestamp) {
+    return new Date(timestamp).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "2-digit"
+    });
   }
 
-  function formatDateShort(ts) {
-    return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  function formatDateShort(timestamp) {
+    return new Date(timestamp).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric"
+    });
   }
 
-  function formatTimeAgo(ts) {
-    const diff = Date.now() - ts;
+  function formatTimeAgo(timestamp) {
+    const diff = Date.now() - timestamp;
     const days = Math.floor(diff / 86400000);
-    if (days === 0) return 'today';
-    if (days === 1) return 'yesterday';
-    if (days < 30)  return `${days}d ago`;
+    if (days === 0) return "today";
+    if (days === 1) return "yesterday";
+    if (days < 30) return `${days}d ago`;
     if (days < 365) return `${Math.round(days / 30)}mo ago`;
     return `${Math.round(days / 365)}yr ago`;
   }
 
-  // ── DOM helpers ───────────────────────────────────────────────────────────
-
-  /** Try a list of CSS selectors, return the first matching element's trimmed text */
   function firstText(selectors, root) {
-    root = root || document;
-    for (const sel of selectors) {
+    const searchRoot = root || document;
+    for (const selector of selectors) {
       try {
-        const el = root.querySelector(sel);
-        if (el) {
-          const t = (el.textContent || el.innerText || '').trim();
-          if (t) return t;
+        const element = searchRoot.querySelector(selector);
+        if (!element) {
+          continue;
         }
-      } catch { /* bad selector */ }
+
+        const text = (element.textContent || element.innerText || "").trim();
+        if (text) {
+          return text;
+        }
+      } catch {
+        // Ignore invalid selectors.
+      }
     }
     return null;
   }
 
-  /** Same but returns the element instead of its text */
   function firstEl(selectors, root) {
-    root = root || document;
-    for (const sel of selectors) {
+    const searchRoot = root || document;
+    for (const selector of selectors) {
       try {
-        const el = root.querySelector(sel);
-        if (el) return el;
-      } catch { /* bad selector */ }
+        const element = searchRoot.querySelector(selector);
+        if (element) {
+          return element;
+        }
+      } catch {
+        // Ignore invalid selectors.
+      }
     }
     return null;
   }
 
-  function isVisible(el) {
-    if (!el) return false;
-    const s = window.getComputedStyle(el);
-    return s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
-  }
+  function isVisible(element) {
+    if (!element) {
+      return false;
+    }
 
-  // ── Misc ──────────────────────────────────────────────────────────────────
+    const style = window.getComputedStyle(element);
+    return style.display !== "none" && style.visibility !== "hidden" && style.opacity !== "0";
+  }
 
   function debounce(fn, delay) {
-    let t;
-    return function (...args) {
-      clearTimeout(t);
-      t = setTimeout(() => fn.apply(this, args), delay);
+    let timerId = null;
+    return function () {
+      const args = arguments;
+      clearTimeout(timerId);
+      timerId = setTimeout(() => fn.apply(this, args), delay);
     };
   }
 
-  function clamp(n, min, max) {
-    return Math.min(max, Math.max(min, n));
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
   }
 
   return {
